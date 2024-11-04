@@ -10,20 +10,20 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+# area: AREA
+# workgroup: WG Working Group
 keyword:
  - home servers
  - tls
  - tofu
 
 venue:
-  group: IOTOPS
-  type: Working Group
-  mail: iotops@ietf.org
-  arch: https://mailarchive.ietf.org/arch/browse/iotops/
-  github: danwing/referee
-  latest: https://danwing.github.io/referee
+#  group: IOTOPS
+#  type: Working Group
+#  mail: iotops@ietf.org
+#  arch: https://mailarchive.ietf.org/arch/browse/iotops/
+  github: "danwing/referee"
+  latest: "https://danwing.github.io/referee/draft-xyzzy-referee.html"
 
 author:
  -
