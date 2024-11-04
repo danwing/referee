@@ -1,0 +1,286 @@
+
+
+
+
+Network Working Group                                            D. Wing
+Internet-Draft                                      Cloud Software Group
+Intended status: Standards Track                         4 November 2024
+Expires: 8 May 2025
+
+
+                 A Referee to Authenticate Home Servers
+                       draft-xyzzy-referee-latest
+
+Abstract
+
+   Obtaining and maintaining PKI certificates for devices in a home
+   network is difficult for both technical and human factors reasons.
+   This document describes an alternative approach to securely identify
+   and authenticate home servers using a referee system.  The referee
+   allows bootstrapping a network of devices by trusting only one system
+   in the home network.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://danwing.github.io/referee/draft-xyzzy-referee.html.  Status
+   information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-xyzzy-referee/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/danwing/referee.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 8 May 2025.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Requirements Evaluation
+   4.  Operation Overview
+     4.1.  Referee
+     4.2.  Servers
+     4.3.  Clients
+   5.  Bootstrapping Server Public Keys to the Referee
+     5.1.  QR Scan
+     5.2.  manual entry
+     5.3.  TOFU
+     5.4.  Outstanding questions and issues
+     5.5.  Operational Notes
+   6.  Security Considerations
+   7.  IANA Considerations
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   Most existing TLS communications require the server obtaining a
+   certificate signed by a Certification Authority trusted by the
+   client.  Within a home network this is fraught with complications of
+   both human factors and technical nature.
+
+   This document describes a Referee System, where a Referee is
+   entrusted (once) to help clients identify and authenticate (many)
+   servers within the home network.  The Referee System purposefully
+   avoids using the public key infrastructure (PKI).
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Requirements Evaluation
+
+   Using requirements from [I-D.rbw-home-servers], the proposal in this
+   document has the following summarized characteristics:
+
+    +==========+========+===========+============+==========+========+
+    | Solution | Reduce | Eliminate |  Existing  | Existing | Revoke |
+    |          |   CA   |     CA    | CA Support |  Client  |  Auth  |
+    |          |        |           |            | Support  |        |
+    +==========+========+===========+============+==========+========+
+    |  Referee |  Yes   |    Yes    |    N/A     |    No    |  Yes   |
+    +----------+--------+-----------+------------+----------+--------+
+
+             Table 1: Summary of Referee Against Requirements
+
+4.  Operation Overview
+
+4.1.  Referee
+
+   The Referee function is implemented within any always-on device
+   within the home (e.g., router, smart home hub, NAS).  The Referee
+   contains a database of local hostnames and their Referee public key
+   fingerprints.
+
+   Clients authenticate to the Referee using the TLS 'referee'
+   extension.  Thus, clients wishing to participate in a 'referee'
+   system need to be updated to support the TLS 'referee' extension.
+
+   The Referee may need to revoke authorization for a server (e.g.,
+   replacement of a printer).  This is accomodated by the client
+   procedures which will query the Referee if the client's cached public
+   key does not match the server's public key.  This revocation happens
+   immediately after the Referee updates the public key associated with
+   that server name.
+
+4.2.  Servers
+
+   A server supporting this specification is expected to be a printer
+   (using IPPS or HTTPS), NAS, IoT device, router (especially its HTTPS-
+   based management console or its ssh server), or similar.
+
+   Each in-home device supporting Referee has a fixed public key, which
+   persits for the lifetime of the device.  During installation of the
+   device to a Referee network, the device's hostname and public key
+   fingerprint are stored into the Referee Server.  Several options
+   exist for this step, detailed in Section 5.
+
+   A server supporting this specification also supports the new TLS
+   ClientHello extension "referee".  Upon receiving such a ClientHello,
+   the server responds with its Referee public key [RFC7250] rather than
+   a PKI certificate.
+
+      Note: if a factory reset changes the device's Referee public key,
+      the new key will need to be re-enrolled with the Referee and the
+      old key removed.
+
+4.3.  Clients
+
+   A client supporting this specification is first configured with the
+   DNS name of its Referee server.  It authenticates to the Referee
+   server using one of the bootstrapping mechanisms (see Section 5).
+   This step occurs only once for each home network the client joins, as
+   each home network is responsible for being a Referee for its own
+   devices.
+
+   When connecting to a server with an .internal domain, a client
+   supporting this specification includes the TLS extension "referee" in
+   its TLS ClientHello.  This causes the server to respond with its
+   Referee raw public key [RFC7250] rather than a PKI certificate (which
+   the client might or might not trust, based on how that PKI
+   certificate was signed).
+
+   For the client, there are two situations that may occur: it has not
+   previously cached the association of hostname to public key or it has
+   cached that information.
+
+   *  If not previously cached, the client queries that network's
+      Referee with the DNS name of the server (e.g., printer.internal).
+      The Referee responds with the public key fingerprint of that
+      server.  The client checks if the public key fingerprint (from the
+      Referee) matches the public key of the server (from the TLS
+      handshake).  If they match, communication with the server
+      continues.  The server MAY also cache the server name and public
+      key.  If they do not match, the client aborts this coummunication
+      session; further actions by the client are an implementation
+      detail.
+
+   *  If previously cached, the client determines if the cached public
+      key matches the public key just obtained.  If they match,
+      communication continues.  If they do not match, the client aborts
+      the communication; futher actions by the client are an
+      implementation detail.
+
+5.  Bootstrapping Server Public Keys to the Referee
+
+5.1.  QR Scan
+
+5.2.  manual entry
+
+5.3.  TOFU
+
+5.4.  Outstanding questions and issues
+
+   *  Currently the text suggests clients should fallback to PKI if
+      Referee validation fails.  But is such fallback harmful or is it
+      worthwhile?
+
+   *  If client has multiple Referees configured, how does client know
+      which Referee to use for the network it has joined?  If SSID,
+      wither Ethernet?  Maybe during TLS handshake the server could
+      indicate the server's Referee??
+
+   *  printer.internal or printer.local are handy names.  Are they
+      suitable for this system, or do we need site-specific names
+      containing a unique identifier like a UUID, e.g.,
+      printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  If we need
+      unique name, can we CNAME from printer.internal to the unique
+      name?
+
+5.5.  Operational Notes
+
+   The Referee has to always be available.  The client cache helps
+   reduce load on the Referee but new clients (e.g., new devices, guest
+   users, restored devices) and client cache invalidation will always
+   cause some traffic to the Referee.
+
+   When the Referee is unavailable, clients behavior devolves to what we
+   have today: servers will need to obtain a real PKI certificate signed
+   by a Certification Authority already trusted by the clients, or else
+   clients will need to manually trust individual certificates.
+
+6.  Security Considerations
+
+   See Section 5.5 describing client behavior when the Referee is
+   unavailable.
+
+7.  IANA Considerations
+
+   Register TLS ClientHello extension "referee".
+
+8.  References
+
+8.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC7250]  Wouters, P., Ed., Tschofenig, H., Ed., Gilmore, J.,
+              Weiler, S., and T. Kivinen, "Using Raw Public Keys in
+              Transport Layer Security (TLS) and Datagram Transport
+              Layer Security (DTLS)", RFC 7250, DOI 10.17487/RFC7250,
+              June 2014, <https://www.rfc-editor.org/rfc/rfc7250>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+8.2.  Informative References
+
+   [I-D.rbw-home-servers]
+              Reddy.K, T., Boucadair, M., and D. Wing, "Identifying and
+              Authenticating Home Servers: Requirements and Solution
+              Analysis", Work in Progress, Internet-Draft, draft-rbw-
+              home-servers-00, 19 September 2024,
+              <https://datatracker.ietf.org/doc/html/draft-rbw-home-
+              servers-00>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Author's Address
+
+   Dan Wing
+   Cloud Software Group Holdings, Inc.
+   Email: danwing@gmail.com
