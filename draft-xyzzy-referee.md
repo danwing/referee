@@ -155,28 +155,50 @@ by the client are an implementation detail.
 
 # Bootstrapping Server Public Keys to the Referee {#bootstrapping}
 
-## QR Scan
+## Short Code or Scan Code
 
-## manual entry
+Short code printed on the Referee-capable server which can be scanned
+by a smartphone application by the home administrator which is
+authorized to push new associations to the Referee.  Alternatively,
+the same information could be manually typed in by the home
+administrator to the Referee's management GUI or CLI.
 
 ## TOFU
 
-## Outstanding questions and issues
+A client device which leans the Referee does not have an existing
+entry for a (new) name is authorized to 'push' the (new) name and
+its public key fingerprint to the Referee.
 
-* Currently the text suggests clients should fallback to PKI if
-  Referee validation fails.  But is such fallback harmful or is it
-  worthwhile?
 
-* If client has multiple Referees configured, how does client know
-  which Referee to use for the network it has joined?  If SSID,
-  wither Ethernet?  Maybe during TLS handshake the server could
-  indicate the server's Referee??
+# Points for Further Discussion 
 
-* printer.internal or printer.local are handy names.  Are they
-  suitable for this system, or do we need site-specific names
-  containing a unique identifier like a UUID, e.g.,
-  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  If we need
-  unique name, can we CNAME from printer.internal to the unique name?
+## PKI fallback
+
+Currently the text suggests clients should fallback to PKI if Referee
+validation fails.  But is such fallback harmful or is it worthwhile?
+
+## Multiple Networks, multiple Referees
+
+If client has multiple Referees configured (due to visiting multiple
+networks), how does client know which Referee to use for the network
+it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
+the server could indicate the server's Referee??
+
+If there is only one referee, this problem never occurs.
+
+## Unique Names
+
+Printer.internal or printer.local are handy names.  Are they suitable
+  for this system, or do we need site-specific names containing a
+  unique identifier like a UUID, e.g.,
+  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  Or perhaps
+  embedding part/all of the public key into the name itself:
+
+  * printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
+  * nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
+
+If we need unique name, can we CNAME from printer.internal to the
+unique name?
 
 
 
