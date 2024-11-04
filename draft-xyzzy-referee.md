@@ -59,7 +59,8 @@ human factors and technical nature.
 This document describes a Referee system, where a Referee is entrusted
 (once) to help clients identify and authenticate (many) servers within
 the home network.  The Referee system purposefully avoids Public Key
-Infrastructure using X.509 {{?PKIX=RFC5280}}.
+Infrastructure using X.509 {{?PKIX=RFC5280}}.  The TLS handshakes
+only use raw public keys {{!RFC7250}}.
 
 # Conventions and Definitions
 
@@ -114,9 +115,10 @@ TLS ClientHello extension "referee". Upon receiving such a ClientHello,
 the server responds with its Referee public key {{!RFC7250}} rather
 than a PKI certificate.
 
-> Note: if a factory reset changes the device's Referee public key,
-  the new key will need to be re-enrolled with the Referee and the old
-  key removed.
+> Note: if a server's Referee public key changes (e.g., factory reset,
+  changed public key algorithm, key length change) the new key needs
+  to be enrolled with the Referee and the old key removed. Clients
+  will notice the mis-match and will query the Referee.
 
 ## Clients
 
