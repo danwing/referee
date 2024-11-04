@@ -17,10 +17,10 @@ keyword:
  - tofu
 
 venue:
-#  group: IOTOPS
-#  type: Working Group
-#  mail: iotops@ietf.org
-#  arch: https://mailarchive.ietf.org/arch/browse/iotops/
+  group: IOTOPS
+  type: Working Group
+  mail: iotops@ietf.org
+  arch: https://mailarchive.ietf.org/arch/browse/iotops/
   github: "danwing/referee"
   latest: "https://danwing.github.io/referee/draft-xyzzy-referee.html"
 
@@ -56,10 +56,10 @@ certificate signed by a Certification Authority trusted by the client.
 Within a home network this is fraught with complications of both
 human factors and technical nature.
 
-This document describes a Referee System, where a Referee is entrusted
+This document describes a Referee system, where a Referee is entrusted
 (once) to help clients identify and authenticate (many) servers within
-the home network.  The Referee System purposefully avoids using the
-public key infrastructure (PKI).
+the home network.  The Referee system purposefully avoids Public Key
+Infrastructure using X.509 {{?PKIX=RFC5280}}.
 
 # Conventions and Definitions
 
@@ -152,10 +152,27 @@ do not match, the client aborts the communication; futher actions
 by the client are an implementation detail.
 
 
+# Bootstrapping the Referee {#bootstrapping}
 
-# Bootstrapping Server Public Keys to the Referee {#bootstrapping}
+## Clients to Referee
 
-## Short Code or Scan Code
+The clients have to be configured to trust their Referee. This is
+a one time activity, for each home network the client joins.
+
+The client will use the TLS "referee" extension to access the
+Referee server itself. This means the client has to be configured
+with the Referee server's public key fingerprint.
+
+This can be done manually or using TOFU.
+
+> Note: Use SVCB?
+
+## Servers to Referee
+
+Server names and their associated public key fingerprints have to
+be populated into the Referee.
+
+### Short Code or Scan Code
 
 Short code printed on the Referee-capable server which can be scanned
 by a smartphone application by the home administrator which is
@@ -163,42 +180,45 @@ authorized to push new associations to the Referee.  Alternatively,
 the same information could be manually typed in by the home
 administrator to the Referee's management GUI or CLI.
 
-## TOFU
+### TOFU
 
 A client device which leans the Referee does not have an existing
 entry for a (new) name is authorized to 'push' the (new) name and
 its public key fingerprint to the Referee.
 
 
-# Points for Further Discussion 
+# Points for Further Discussion
 
-## PKI fallback
+## PKI Fallback
 
 Currently the text suggests clients should fallback to PKI if Referee
 validation fails.  But is such fallback harmful or is it worthwhile?
 
-## Multiple Networks, multiple Referees
+## Multiple Networks: Multiple Referees
 
 If client has multiple Referees configured (due to visiting multiple
 networks), how does client know which Referee to use for the network
 it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
-the server could indicate the server's Referee??
+the server could indicate the server's Referee (akin to
+{{?I-D.beck-tls-trust-anchor-ids}}).
 
 If there is only one referee, this problem never occurs.
 
 ## Unique Names
 
 Printer.internal or printer.local are handy names.  Are they suitable
-  for this system, or do we need site-specific names containing a
-  unique identifier like a UUID, e.g.,
-  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  Or perhaps
-  embedding part/all of the public key into the name itself:
+for this system, or do we need site-specific names containing a unique
+identifier like a UUID, e.g.,
+printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  Or perhaps
+embedding part/all of the public key into the name itself, for example:
 
-  * printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
-  * nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
+~~~~~
+  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
+  nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
+~~~~~
 
-If we need unique name, can we CNAME from printer.internal to the
-unique name?
+If we need unique name, we could CNAME from a convenient name
+(printer.internal) to the unique name.
 
 
 
