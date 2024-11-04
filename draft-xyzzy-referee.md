@@ -3,7 +3,6 @@ title: "A Referee to Authenticate Home Servers"
 abbrev: "Referee"
 category: std
 
-
 docname: draft-xyzzy-referee-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
@@ -57,14 +56,25 @@ certificate signed by a Certification Authority trusted by the client.
 Within a home network this is fraught with complications of both
 human factors and technical nature.
 
-This document describes a Referee System, where a Referee is
-entrusted to help clients identify and authenticate servers within
-the home network.  The Referee System purposefully avoids using
-the public key infrastructure (PKI).
+This document describes a Referee System, where a Referee is entrusted
+(once) to help clients identify and authenticate (many) servers within
+the home network.  The Referee System purposefully avoids using the
+public key infrastructure (PKI).
 
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
+
+# Requirements Evaluation
+
+Using requirements from {{?I-D.rbw-home-servers}}, the proposal in this
+document has the following summarized characteristics:
+
+|    Solution                 | Reduce CA             | Eliminate CA     | Existing CA Support | Existing Client Support | Revoke Auth |
+|----------------------------:|:---------------------:|:----------------:|:-------------------:|:-----------------------:|:-----------:|
+| Referee                     | Yes                   |  Yes             |   N/A               |   No                    |   Yes       |
+{: #table1 title="Summary of Referee Against Requirements"}
+
 
 # Operation Overview
 
@@ -74,6 +84,18 @@ The Referee function is implemented within any always-on device
 within the home (e.g., router, smart home hub, NAS).  The Referee
 contains a database of local hostnames and their Referee public
 key fingerprints.
+
+Clients authenticate to the Referee using the TLS 'referee'
+extension.  Thus, clients wishing to participate in a 'referee'
+system need to be updated to support the TLS 'referee' extension.
+
+The Referee may need to revoke authorization for a server (e.g.,
+replacement of a printer). This is accomodated by the client procedures
+which will query the Referee if the client's cached public key does
+not match the server's public key. This revocation happens immediately
+after the Referee updates the public key associated with that server
+name.
+
 
 ## Servers
 
@@ -114,7 +136,7 @@ For the client, there are two situations that may occur:  it has
 not previously cached the association of hostname to public key or it
 has cached that information.
 
-* If not previously cached, queries that network's Referee with the
+* If not previously cached, the client queries that network's Referee with the
 DNS name of the server (e.g., printer.internal).  The Referee responds
 with the public key fingerprint of that server.  The client checks if
 the public key fingerprint (from the Referee) matches the public key
@@ -131,7 +153,6 @@ by the client are an implementation detail.
 
 
 
-
 # Bootstrapping Server Public Keys to the Referee {#bootstrapping}
 
 ## QR Scan
@@ -142,7 +163,21 @@ by the client are an implementation detail.
 
 ## Outstanding questions and issues
 
-* Should the client cache expire?
+* Currently the text suggests clients should fallback to PKI if
+  Referee validation fails.  But is such fallback harmful or is it
+  worthwhile?
+
+* If client has multiple Referees configured, how does client know
+  which Referee to use for the network it has joined?  If SSID,
+  wither Ethernet?  Maybe during TLS handshake the server could
+  indicate the server's Referee??
+
+* printer.internal or printer.local are handy names.  Are they
+  suitable for this system, or do we need site-specific names
+  containing a unique identifier like a UUID, e.g.,
+  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  If we need
+  unique name, can we CNAME from printer.internal to the unique name?
+
 
 
 
