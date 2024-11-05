@@ -1691,6 +1691,12 @@ into the network's Referee.  To automate such changes, the server could connect 
 Referee and prove possession of its (old) private key (using TLS
 client authentication or using application-layer mechanism such as
 JSON Web Signature) and publish its new public key using an HTTP PUT.<a href="#appendix-A.4.1-1" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="appendix-A.4.1-2.1">
+              <p id="appendix-A.4.1-2.1.1">Note: such a PUT mechanism also means an attacker in possession of the server's private
+key can change that server's public key fingerprint in the Referee.<a href="#appendix-A.4.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
 </section>
 </div>
 <div id="referee-1">
@@ -1699,17 +1705,17 @@ JSON Web Signature) and publish its new public key using an HTTP PUT.<a href="#a
 <a href="#appendix-A.4.2" class="section-number selfRef">A.4.2. </a><a href="#name-referee-2" class="section-name selfRef">Referee</a>
           </h4>
 <p id="appendix-A.4.2-1">If the Referee's raw public key changes all the clients have to
-re-authenticate that new raw public key.  This is uncool.<a href="#appendix-A.4.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.4.2-2">To allow changing the Referee's raw public key without
-re-authenticating, perhaps the client and Referee could do session
-resumption for its subsequent connections to the Referee (Section 2.2
-of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>).  When doing session resumption with the Referee, the
-client should also retrieve the Referee's current public key fingerprint
-so if, in the future, the Referee cannot perform session resumption the
-client can still authenticate the Referee.<a href="#appendix-A.4.2-2" class="pilcrow">¶</a></p>
-<p id="appendix-A.4.2-3">With the above technique, the remaining situation where a client
-still has to (manually) re-authenticate the Referee is when the
-Referee cannot honor session resumption.<a href="#appendix-A.4.2-3" class="pilcrow">¶</a></p>
+re-authenticate the Referee's new raw public key.  This is uncool.<a href="#appendix-A.4.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.4.2-2">To allow changing the Referee's raw public key without client
+re-authentication, the client and Referee could do session resumption
+for its subsequent connections to the Referee (Section 2.2 of
+<span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>).  When doing session resumption with the Referee, the
+client should also retrieve and cache the Referee's current public key
+fingerprint so if, in the future, the Referee cannot perform session
+resumption the client can still authenticate the Referee.<a href="#appendix-A.4.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.4.2-3">With the above technique, the client will only have to (manually)
+re-authenticate the Referee when the Referee cannot perform session
+resumption.<a href="#appendix-A.4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

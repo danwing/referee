@@ -402,22 +402,26 @@ A.4.1.  Server
    layer mechanism such as JSON Web Signature) and publish its new
    public key using an HTTP PUT.
 
+      Note: such a PUT mechanism also means an attacker in possession of
+      the server's private key can change that server's public key
+      fingerprint in the Referee.
+
 A.4.2.  Referee
 
    If the Referee's raw public key changes all the clients have to re-
-   authenticate that new raw public key.  This is uncool.
+   authenticate the Referee's new raw public key.  This is uncool.
 
-   To allow changing the Referee's raw public key without re-
-   authenticating, perhaps the client and Referee could do session
-   resumption for its subsequent connections to the Referee (Section 2.2
-   of [RFC8446]).  When doing session resumption with the Referee, the
-   client should also retrieve the Referee's current public key
-   fingerprint so if, in the future, the Referee cannot perform session
-   resumption the client can still authenticate the Referee.
+   To allow changing the Referee's raw public key without client re-
+   authentication, the client and Referee could do session resumption
+   for its subsequent connections to the Referee (Section 2.2 of
+   [RFC8446]).  When doing session resumption with the Referee, the
+   client should also retrieve and cache the Referee's current public
+   key fingerprint so if, in the future, the Referee cannot perform
+   session resumption the client can still authenticate the Referee.
 
-   With the above technique, the remaining situation where a client
-   still has to (manually) re-authenticate the Referee is when the
-   Referee cannot honor session resumption.
+   With the above technique, the client will only have to (manually) re-
+   authenticate the Referee when the Referee cannot perform session
+   resumption.
 
 Acknowledgments
 
