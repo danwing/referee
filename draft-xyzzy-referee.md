@@ -77,7 +77,7 @@ document has the following summarized characteristics:
 {: #table1 title="Summary of Referee Against Requirements"}
 
 
-# Operation Overview
+# Operation
 
 ## Referee
 
@@ -86,17 +86,11 @@ within the home (e.g., router, smart home hub, NAS).  The Referee
 contains a database of local hostnames and their Referee public
 key fingerprints.
 
+The Referee on a local network is named "referee.internal".
+
 Clients authenticate to the Referee using the TLS 'referee'
 extension.  Thus, clients wishing to participate in a 'referee'
 system need to be updated to support the TLS 'referee' extension.
-
-The Referee may need to revoke authorization for a server (e.g.,
-replacement of a printer). This is accomodated by the client procedures
-which will query the Referee if the client's cached public key does
-not match the server's public key. This revocation happens immediately
-after the Referee updates the public key associated with that server
-name.
-
 
 ## Servers
 
@@ -154,6 +148,23 @@ do not match, the client aborts the communication; futher actions
 by the client are an implementation detail.
 
 
+## Revoking Authorization
+
+When the administrator revoke authorization for a server (e.g., replacement
+of a printer), the administrator removes the old public key from the Referee
+and installs the new key in the Referee.
+
+When this replacement occurs, the clients that have not already cached
+the server's public key will simply query the Referee, which has the server's
+new public key.  The clients that have cached the server's previous public
+key will notice the mismatch, pause their communication with the server, and
+validate with the Referee that the new key is legitimate, and continue their
+communication with the server.
+
+Thus, revoking authentication has immediate effect because the clients
+immediately validate a mismatch with the Referee.
+
+
 # Bootstrapping the Referee {#bootstrapping}
 
 ## Clients to Referee
@@ -167,7 +178,13 @@ with the Referee server's public key fingerprint.
 
 This can be done manually or using TOFU.
 
-> Note: Use SVCB?
+> Note: To reduce initial bootstrap for client, perhaps use SVCB for
+  client to bootstrap its first Referee?  This effectively achieves
+  un-authenticated encryption to devices on the local network which is
+  better than unencrypted traffic to those same devices.  For an
+  attacker to abuse this, it requires an attacker advertise itself
+  as the Referee and to maintain its status as Referee.
+
 
 ## Servers to Referee
 
@@ -188,8 +205,39 @@ A client device which leans the Referee does not have an existing
 entry for a (new) name is authorized to 'push' the (new) name and
 its public key fingerprint to the Referee.
 
+# Operational Notes {#operational-notes}
 
-# Points for Further Discussion
+The Referee has to always be available.  The client cache helps reduce
+load on the Referee but new clients (e.g., new devices, guest users, restored
+devices) and client cache invalidation will always cause some traffic to
+the Referee.
+
+When the Referee is unavailable, clients behavior devolves to what
+we have today:  servers will need to obtain a real PKI certificate
+signed by a Certification Authority already trusted by the clients, or
+else clients will need to manually trust individual certificates.
+
+
+
+
+
+
+# Security Considerations
+
+See {{operational-notes}} describing client behavior when the Referee
+is unavailable.
+
+
+# IANA Considerations
+
+Register TLS ClientHello extension "referee".
+
+
+--- back
+
+
+
+# Issues for Further Discussion
 
 ## PKI Fallback
 
@@ -224,34 +272,8 @@ If we need unique name, we could CNAME from a convenient name
 
 
 
-
-## Operational Notes {#operational-notes}
-
-The Referee has to always be available.  The client cache helps reduce
-load on the Referee but new clients (e.g., new devices, guest users, restored
-devices) and client cache invalidation will always cause some traffic to
-the Referee.
-
-When the Referee is unavailable, clients behavior devolves to what
-we have today:  servers will need to obtain a real PKI certificate
-signed by a Certification Authority already trusted by the clients, or
-else clients will need to manually trust individual certificates.
-
-
-# Security Considerations
-
-See {{operational-notes}} describing client behavior when the Referee
-is unavailable.
-
-
-# IANA Considerations
-
-Register TLS ClientHello extension "referee".
-
-
---- back
-
 # Acknowledgments
 {:numbered="false"}
 
 TODO acknowledge.
+
