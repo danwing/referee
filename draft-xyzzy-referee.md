@@ -103,8 +103,8 @@ key fingerprints.
 
 The Referee on a local network is named "referee.internal".
 
-Clients authenticate to the Referee using the TLS server_certificate_type
-extension and use HTTP GET to fetch the named public key fingerprint
+Clients authenticate to the Referee using raw public keys (using
+TLS server_certificate_type extension) and use HTTP GET to fetch the named public key fingerprint
 from the Referee server.  For example to get public key fingerprint of
 a server named printer.internal,
 
@@ -129,9 +129,10 @@ fingerprint are stored into the Referee Server.  Several options
 exist for this step, detailed in {{bootstrapping}}.
 
 A server supporting this specification needs to support raw public
-keys {{!RFC7250}} and its server_certificate_type extension. Upon
-receiving a ClientHello with the server_certificate_type extension
-the server responds with its raw public key {{!RFC7250}} rather than a
+keys with the server_certificate_type extension ({{!RFC7250}}). As
+detailed in {{!RFC7250}}, when the server
+receives a ClientHello with the raw public key certificate type in the server_certificate_type extension
+the server responds with its raw public key rather than a
 PKI certificate.
 
 If a server's referee public key changes (e.g., factory reset,
@@ -148,9 +149,10 @@ using one of the bootstrapping mechanisms (see {{bootstrapping}}). This
 step occurs only once for each home network the client joins, as each
 home network is responsible for being a Referee for its own devices.
 
-When connecting to a server with an .internal domain, a client supporting
-this specification includes the TLS server_certificate_type extension {{!RFC7250}} in its TLS
-ClientHello.
+When connecting to a server with an .internal domain, a client
+supporting this specification includes the TLS server_certificate_type
+extension with the Raw Public Key certificate type {{!RFC7250}} in its
+TLS ClientHello.
 
 For the client, there are two situations that may occur:  it has
 not previously cached the association of hostname to public key or it
@@ -196,7 +198,7 @@ immediately validate a mismatch with the Referee.
 The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.
 
-The client also uses the TLS server_certificate_type extension to access the
+The client uses the raw public key certificate type (using TLS server_certificate_type extension) to access the
 Referee server itself. This means the client has to be configured
 to trust the Referee server's public key fingerprint.
 
@@ -209,6 +211,7 @@ This can be done manually or using TOFU, and is implementation specific.
   attacker to abuse this, it requires an attacker advertise itself
   as the Referee and to maintain its status as Referee.
 
+> for discussion: see {{key-lifetime}} regarding Referee key lifetime.
 
 ## Servers to Referee
 
@@ -297,13 +300,37 @@ If we need unique name, we could CNAME from a convenient name
 
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
 
-If a server's raw public key changes the new key has to be installed
-into the network's Referee.
+The raw public keys in a server and in the Referee might be occasionally
+be changed, as discussed in this section.
 
-To automate such changes, the server could communicate with the
+### Server
+
+If a server's raw public key changes the new key has to be installed
+into the network's Referee.  To automate such changes, the server could communicate with the
 Referee and prove possession of its (old) private key (using TLS
 client authentication or using application-layer mechanism such as
 JSON Web Signature) to update the Referee to its new public key.
+
+### Referee
+
+If the Referee's raw public key changes all the clients have to
+re-authenticate that new raw public key.  This is uncool.
+
+To allow changing the Referee's raw public key without
+re-authenticating, perhaps the client and Referee could do session
+resumption for its subsequent connections to the Referee (Section 2.2
+of {{?RFC8446}}).  This handles situations where Referee can honor
+the session resumption.
+
+To handle the case where the Referee cannot honor session resumption
+(and falls back to a normal handshake), the client needs to be
+automatically updated with the Referee's new public key, which can
+be served on the same HTTP endpoint.
+
+With the above technique and a new Referee public key, the remaining
+situation where a client still has to (manually) re-authenticate the
+Referee is when the Referee cannot honor session resumption (that is,
+has lost that state).
 
 
 # Acknowledgments
