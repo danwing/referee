@@ -103,9 +103,18 @@ key fingerprints.
 
 The Referee on a local network is named "referee.internal".
 
-Clients authenticate to the Referee using the TLS 'referee'
-extension.  Thus, clients wishing to participate in a 'referee'
-system need to be updated to support the TLS 'referee' extension.
+Clients authenticate to the Referee using the TLS server_certificate_type
+extension and use HTTP GET to fetch the named public key fingerprint
+from the Referee server.  For example to get public key fingerprint of
+a server named printer.internal,
+
+~~~~
+  GET /.well-known/referee/sha256/printer.internal HTTP/1.1
+~~~~
+
+The public key fingerprint is SHA-256 of the server's public key
+returned as an octet-stream.
+
 
 ## Servers
 
@@ -140,8 +149,7 @@ home network is responsible for being a Referee for its own devices.
 
 When connecting to a server with an .internal domain, a client supporting
 this specification includes the TLS server_certificate_type extension {{!RFC7250}} in its TLS
-ClientHello.  This causes the server to provide with its raw public key
-{{!RFC7250}} rather than its PKI certificate.
+ClientHello.
 
 For the client, there are two situations that may occur:  it has
 not previously cached the association of hostname to public key or it
@@ -245,6 +253,7 @@ is unavailable.
 
 # IANA Considerations
 
+Register new .well_known URI for "referee".
 
 --- back
 
