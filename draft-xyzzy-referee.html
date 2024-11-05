@@ -1088,7 +1088,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Wing</td>
-<td class="center">Expires 8 May 2025</td>
+<td class="center">Expires 9 May 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1101,12 +1101,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-xyzzy-referee-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-11-04" class="published">4 November 2024</time>
+<time datetime="2024-11-05" class="published">5 November 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-05-08">8 May 2025</time></dd>
+<dd class="expires"><time datetime="2025-05-09">9 May 2025</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1161,7 +1161,7 @@ the home network.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 May 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 May 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1200,7 +1200,7 @@ the home network.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-requirements-evaluation" class="internal xref">Requirements Evaluation</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-operation-overview" class="internal xref">Operation Overview</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-operation" class="internal xref">Operation</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
                 <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-referee" class="internal xref">Referee</a></p>
@@ -1210,6 +1210,9 @@ the home network.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
                 <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-clients" class="internal xref">Clients</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-revoking-authorization" class="internal xref">Revoking Authorization</a></p>
 </li>
             </ul>
 </li>
@@ -1233,21 +1236,7 @@ the home network.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-points-for-further-discussi" class="internal xref">Points for Further Discussion</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-pki-fallback" class="internal xref">PKI Fallback</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-multiple-networks-multiple-" class="internal xref">Multiple Networks: Multiple Referees</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-unique-names" class="internal xref">Unique Names</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-operational-notes" class="internal xref">Operational Notes</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-operational-notes" class="internal xref">Operational Notes</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
@@ -1267,10 +1256,24 @@ the home network.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-issues-for-further-discussi" class="internal xref">Issues for Further Discussion</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-pki-fallback" class="internal xref">PKI Fallback</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-multiple-networks-multiple-" class="internal xref">Multiple Networks: Multiple Referees</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
+                <p id="section-toc.1-1.10.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-unique-names" class="internal xref">Unique Names</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1288,7 +1291,8 @@ human factors and technical nature.<a href="#section-1-1" class="pilcrow">¶</a>
 <p id="section-1-2">This document describes a Referee system, where a Referee is entrusted
 (once) to help clients identify and authenticate (many) servers within
 the home network.  The Referee system purposefully avoids Public Key
-Infrastructure using X.509 <span>[<a href="#PKIX" class="cite xref">PKIX</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+Infrastructure using X.509 <span>[<a href="#PKIX" class="cite xref">PKIX</a>]</span>.  The TLS handshakes
+only use raw public keys <span>[<a href="#RFC7250" class="cite xref">RFC7250</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1339,10 +1343,10 @@ document has the following summarized characteristics:<a href="#section-3-1" cla
 </div>
 </section>
 </div>
-<div id="operation-overview">
+<div id="operation">
 <section id="section-4">
-      <h2 id="name-operation-overview">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-operation-overview" class="section-name selfRef">Operation Overview</a>
+      <h2 id="name-operation">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-operation" class="section-name selfRef">Operation</a>
       </h2>
 <div id="referee">
 <section id="section-4.1">
@@ -1353,15 +1357,10 @@ document has the following summarized characteristics:<a href="#section-3-1" cla
 within the home (e.g., router, smart home hub, NAS).  The Referee
 contains a database of local hostnames and their Referee public
 key fingerprints.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1-2">Clients authenticate to the Referee using the TLS 'referee'
+<p id="section-4.1-2">The Referee on a local network is named "referee.internal".<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">Clients authenticate to the Referee using the TLS 'referee'
 extension.  Thus, clients wishing to participate in a 'referee'
-system need to be updated to support the TLS 'referee' extension.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1-3">The Referee may need to revoke authorization for a server (e.g.,
-replacement of a printer). This is accomodated by the client procedures
-which will query the Referee if the client's cached public key does
-not match the server's public key. This revocation happens immediately
-after the Referee updates the public key associated with that server
-name.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+system need to be updated to support the TLS 'referee' extension.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="servers">
@@ -1383,9 +1382,10 @@ the server responds with its Referee public key <span>[<a href="#RFC7250" class=
 than a PKI certificate.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-4.2-4.1">
-            <p id="section-4.2-4.1.1">Note: if a factory reset changes the device's Referee public key,
-  the new key will need to be re-enrolled with the Referee and the old
-  key removed.<a href="#section-4.2-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-4.1.1">Note: if a server's Referee public key changes (e.g., factory reset,
+  changed public key algorithm, key length change) the new key needs
+  to be enrolled with the Referee and the old key removed. Clients
+  will notice the mis-match and will query the Referee.<a href="#section-4.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -1429,6 +1429,24 @@ by the client are an implementation detail.<a href="#section-4.3-4.2.1" class="p
         </ul>
 </section>
 </div>
+<div id="revoking-authorization">
+<section id="section-4.4">
+        <h3 id="name-revoking-authorization">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-revoking-authorization" class="section-name selfRef">Revoking Authorization</a>
+        </h3>
+<p id="section-4.4-1">When the administrator revoke authorization for a server (e.g., replacement
+of a printer), the administrator removes the old public key from the Referee
+and installs the new key in the Referee.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">When this replacement occurs, the clients that have not already cached
+the server's public key will simply query the Referee, which has the server's
+new public key.  The clients that have cached the server's previous public
+key will notice the mismatch, pause their communication with the server, and
+validate with the Referee that the new key is legitimate, and continue their
+communication with the server.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4-3">Thus, revoking authentication has immediate effect because the clients
+immediately validate a mismatch with the Referee.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="bootstrapping">
@@ -1449,7 +1467,12 @@ with the Referee server's public key fingerprint.<a href="#section-5.1-2" class=
 <p id="section-5.1-3">This can be done manually or using TOFU.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-5.1-4.1">
-            <p id="section-5.1-4.1.1">Note: Use SVCB?<a href="#section-5.1-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-4.1.1">Note: To reduce initial bootstrap for client, perhaps use SVCB for
+  client to bootstrap its first Referee?  This effectively achieves
+  un-authenticated encryption to devices on the local network which is
+  better than unencrypted traffic to those same devices.  For an
+  attacker to abuse this, it requires an attacker advertise itself
+  as the Referee and to maintain its status as Referee.<a href="#section-5.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -1487,68 +1510,19 @@ its public key fingerprint to the Referee.<a href="#section-5.2.2-1" class="pilc
 </div>
 </section>
 </div>
-<div id="points-for-further-discussion">
-<section id="section-6">
-      <h2 id="name-points-for-further-discussi">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-points-for-further-discussi" class="section-name selfRef">Points for Further Discussion</a>
-      </h2>
-<div id="pki-fallback">
-<section id="section-6.1">
-        <h3 id="name-pki-fallback">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-pki-fallback" class="section-name selfRef">PKI Fallback</a>
-        </h3>
-<p id="section-6.1-1">Currently the text suggests clients should fallback to PKI if Referee
-validation fails.  But is such fallback harmful or is it worthwhile?<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="multiple-networks-multiple-referees">
-<section id="section-6.2">
-        <h3 id="name-multiple-networks-multiple-">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-multiple-networks-multiple-" class="section-name selfRef">Multiple Networks: Multiple Referees</a>
-        </h3>
-<p id="section-6.2-1">If client has multiple Referees configured (due to visiting multiple
-networks), how does client know which Referee to use for the network
-it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
-the server could indicate the server's Referee (akin to
-<span>[<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>).<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">If there is only one referee, this problem never occurs.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="unique-names">
-<section id="section-6.3">
-        <h3 id="name-unique-names">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-unique-names" class="section-name selfRef">Unique Names</a>
-        </h3>
-<p id="section-6.3-1">Printer.internal or printer.local are handy names.  Are they suitable
-for this system, or do we need site-specific names containing a unique
-identifier like a UUID, e.g.,
-printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  Or perhaps
-embedding part/all of the public key into the name itself, for example:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.3-2">
-<pre>
-  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
-  nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
-</pre><a href="#section-6.3-2" class="pilcrow">¶</a>
-</div>
-<p id="section-6.3-3">If we need unique name, we could CNAME from a convenient name
-(printer.internal) to the unique name.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="operational-notes">
-<section id="section-6.4">
-        <h3 id="name-operational-notes">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-operational-notes" class="section-name selfRef">Operational Notes</a>
-        </h3>
-<p id="section-6.4-1">The Referee has to always be available.  The client cache helps reduce
+<section id="section-6">
+      <h2 id="name-operational-notes">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-operational-notes" class="section-name selfRef">Operational Notes</a>
+      </h2>
+<p id="section-6-1">The Referee has to always be available.  The client cache helps reduce
 load on the Referee but new clients (e.g., new devices, guest users, restored
 devices) and client cache invalidation will always cause some traffic to
-the Referee.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
-<p id="section-6.4-2">When the Referee is unavailable, clients behavior devolves to what
+the Referee.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">When the Referee is unavailable, clients behavior devolves to what
 we have today:  servers will need to obtain a real PKI certificate
 signed by a Certification Authority already trusted by the clients, or
-else clients will need to manually trust individual certificates.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
-</section>
-</div>
+else clients will need to manually trust individual certificates.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -1556,7 +1530,7 @@ else clients will need to manually trust individual certificates.<a href="#secti
       <h2 id="name-security-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-7-1">See <a href="#operational-notes" class="auto internal xref">Section 6.4</a> describing client behavior when the Referee
+<p id="section-7-1">See <a href="#operational-notes" class="auto internal xref">Section 6</a> describing client behavior when the Referee
 is unavailable.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1617,16 +1591,65 @@ is unavailable.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="issues-for-further-discussion">
 <section id="appendix-A">
+      <h2 id="name-issues-for-further-discussi">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-issues-for-further-discussi" class="section-name selfRef">Issues for Further Discussion</a>
+      </h2>
+<div id="pki-fallback">
+<section id="appendix-A.1">
+        <h3 id="name-pki-fallback">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-pki-fallback" class="section-name selfRef">PKI Fallback</a>
+        </h3>
+<p id="appendix-A.1-1">Currently the text suggests clients should fallback to PKI if Referee
+validation fails.  But is such fallback harmful or is it worthwhile?<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="multiple-networks-multiple-referees">
+<section id="appendix-A.2">
+        <h3 id="name-multiple-networks-multiple-">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-multiple-networks-multiple-" class="section-name selfRef">Multiple Networks: Multiple Referees</a>
+        </h3>
+<p id="appendix-A.2-1">If client has multiple Referees configured (due to visiting multiple
+networks), how does client know which Referee to use for the network
+it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
+the server could indicate the server's Referee (akin to
+<span>[<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>).<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-2">If there is only one referee, this problem never occurs.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="unique-names">
+<section id="appendix-A.3">
+        <h3 id="name-unique-names">
+<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-unique-names" class="section-name selfRef">Unique Names</a>
+        </h3>
+<p id="appendix-A.3-1">Printer.internal or printer.local are handy names.  Are they suitable
+for this system, or do we need site-specific names containing a unique
+identifier like a UUID, e.g.,
+printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  Or perhaps
+embedding part/all of the public key into the name itself, for example:<a href="#appendix-A.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.3-2">
+<pre>
+  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
+  nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
+</pre><a href="#appendix-A.3-2" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.3-3">If we need unique name, we could CNAME from a convenient name
+(printer.internal) to the unique name.<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">TODO acknowledge.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
