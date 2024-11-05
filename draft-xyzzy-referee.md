@@ -36,6 +36,13 @@ author:
 normative:
 
 informative:
+  rpk:
+     title: "RFC7250 (RPK) support"
+     author:
+       org: OpenSSL
+       name:
+     date: March 2023
+     target: https://github.com/openssl/openssl/pull/18185
 
 
 --- abstract
@@ -73,9 +80,10 @@ document has the following summarized characteristics:
 
 |    Solution                 | Reduce CA             | Eliminate CA     | Existing CA Support | Existing Client Support | Revoke Auth |
 |----------------------------:|:---------------------:|:----------------:|:-------------------:|:-----------------------:|:-----------:|
-| Referee                     | Yes                   |  Yes             |   N/A               |   No                    |   Yes       |
+| Referee                     | Yes                   |  Yes             |   N/A               |   Some (*)              |   Yes       |
 {: #table1 title="Summary of Referee Against Requirements"}
 
+(*) Support exists in OpenSSL library {{rpk}}.
 
 # Operation
 
@@ -104,15 +112,16 @@ device to a Referee network, the device's hostname and public key
 fingerprint are stored into the Referee Server.  Several options
 exist for this step, detailed in {{bootstrapping}}.
 
-A server supporting this specification also supports the new
-TLS ClientHello extension "referee". Upon receiving such a ClientHello,
-the server responds with its Referee public key {{!RFC7250}} rather
-than a PKI certificate.
+A server supporting this specification needs to support raw public
+keys {{!RFC7250}} and its server_certificate_type extension. Upon
+receiving a ClientHello with the server_certificate_type extension
+the server responds with its raw public key {{!RFC7250}} rather than a
+PKI certificate.
 
-> Note: if a server's Referee public key changes (e.g., factory reset,
-  changed public key algorithm, key length change) the new key needs
-  to be enrolled with the Referee and the old key removed. Clients
-  will notice the mis-match and will query the Referee.
+If a server's referee public key changes (e.g., factory reset,
+public key algorithm, key length) the new key needs
+to be enrolled with the Referee and the old key removed. Clients
+will notice the mis-match and will query the Referee.
 
 ## Clients
 
@@ -123,10 +132,9 @@ step occurs only once for each home network the client joins, as each
 home network is responsible for being a Referee for its own devices.
 
 When connecting to a server with an .internal domain, a client supporting
-this specification includes the TLS extension "referee" in its TLS
-ClientHello.  This causes the server to respond with its Referee raw
-public key {{!RFC7250}} rather than a PKI certificate (which the client
-might or might not trust, based on how that PKI certificate was signed).
+this specification includes the TLS server_certificate_type extension {{!RFC7250}} in its TLS
+ClientHello.  This causes the server to provide with its raw public key
+{{!RFC7250}} rather than its PKI certificate.
 
 For the client, there are two situations that may occur:  it has
 not previously cached the association of hostname to public key or it
@@ -172,13 +180,13 @@ immediately validate a mismatch with the Referee.
 The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.
 
-The client will use the TLS "referee" extension to access the
+The client also uses the TLS server_certificate_type extension to access the
 Referee server itself. This means the client has to be configured
-with the Referee server's public key fingerprint.
+to trust the Referee server's public key fingerprint.
 
-This can be done manually or using TOFU.
+This can be done manually or using TOFU, and is implementation specific.
 
-> Note: To reduce initial bootstrap for client, perhaps use SVCB for
+> for discussion: To reduce initial bootstrap for client, perhaps use SVCB for
   client to bootstrap its first Referee?  This effectively achieves
   un-authenticated encryption to devices on the local network which is
   better than unencrypted traffic to those same devices.  For an
@@ -229,8 +237,6 @@ is unavailable.
 
 
 # IANA Considerations
-
-Register TLS ClientHello extension "referee".
 
 
 --- back
