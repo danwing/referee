@@ -123,7 +123,7 @@ A server supporting this specification is expected to be a printer
 HTTPS-based management console or its ssh server), or similar.
 
 Each in-home device supporting Referee has a fixed public key, which
-persits for the lifetime of the device.  During installation of the
+persists for the lifetime of the device.  During installation of the
 device to a Referee network, the device's hostname and public key
 fingerprint are stored into the Referee Server.  Several options
 exist for this step, detailed in {{bootstrapping}}.
@@ -165,12 +165,12 @@ the public key fingerprint (from the Referee) matches the public key
 of the server (from the TLS handshake). If they match, communication
 with the server continues.  The server MAY also cache the server name
 and public key.  If they do not match, the client aborts this
-coummunication session; further actions by the client are an
+communication session; further actions by the client are an
 implementation detail.
 
 * If previously cached, the client determines if the cached public key matches the public
 key just obtained.  If they match, communication continues.  If they
-do not match, the client aborts the communication; futher actions
+do not match, the client aborts the communication; further actions
 by the client are an implementation detail.
 
 
@@ -300,16 +300,17 @@ If we need unique name, we could CNAME from a convenient name
 
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
 
-The raw public keys in a server and in the Referee might be occasionally
-be changed, as discussed in this section.
+For security hygiene, the raw public keys in a server and in the Referee
+are occasionally changed. This section discusses how such changes are
+handled by a Referee system.
 
 ### Server
 
 If a server's raw public key changes the new key has to be installed
-into the network's Referee.  To automate such changes, the server could communicate with the
+into the network's Referee.  To automate such changes, the server could connect to the
 Referee and prove possession of its (old) private key (using TLS
 client authentication or using application-layer mechanism such as
-JSON Web Signature) to update the Referee to its new public key.
+JSON Web Signature) and publish its new public key using an HTTP PUT.
 
 ### Referee
 
@@ -319,18 +320,15 @@ re-authenticate that new raw public key.  This is uncool.
 To allow changing the Referee's raw public key without
 re-authenticating, perhaps the client and Referee could do session
 resumption for its subsequent connections to the Referee (Section 2.2
-of {{?RFC8446}}).  This handles situations where Referee can honor
-the session resumption.
+of {{?RFC8446}}).  When doing session resumption with the Referee, the
+client should also retrieve the Referee's current public key fingerprint
+so if, in the future, the Referee cannot perform session resumption the
+client can still authenticate the Referee.
 
-To handle the case where the Referee cannot honor session resumption
-(and falls back to a normal handshake), the client needs to be
-automatically updated with the Referee's new public key, which can
-be served on the same HTTP endpoint.
+With the above technique, the remaining situation where a client
+still has to (manually) re-authenticate the Referee is when the
+Referee cannot honor session resumption.
 
-With the above technique and a new Referee public key, the remaining
-situation where a client still has to (manually) re-authenticate the
-Referee is when the Referee cannot honor session resumption (that is,
-has lost that state).
 
 
 # Acknowledgments
