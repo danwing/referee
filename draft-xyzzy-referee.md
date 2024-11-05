@@ -36,7 +36,7 @@ author:
 normative:
 
 informative:
-  rpk:
+  rpk-openssl:
      title: "RFC7250 (RPK) support"
      author:
        org: OpenSSL
@@ -44,6 +44,13 @@ informative:
      date: March 2023
      target: https://github.com/openssl/openssl/pull/18185
 
+  rpk-wolfssl:
+     title: "wolfSSL supports Raw Public Keys"
+     author:
+       org: WolfSSL
+       name:
+     date: August 2023
+     target: https://www.wolfssl.com/wolfssl-supports-raw-public-keys/
 
 --- abstract
 
@@ -83,7 +90,7 @@ document has the following summarized characteristics:
 | Referee                     | Yes                   |  Yes             |   N/A               |   Some (*)              |   Yes       |
 {: #table1 title="Summary of Referee Against Requirements"}
 
-(*) Support exists in OpenSSL library {{rpk}}.
+(*) Support exists in OpenSSL {{rpk-openssl}} and WolfSSL {{rpk-wolfssl}}.
 
 # Operation
 
