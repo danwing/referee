@@ -137,7 +137,8 @@ PKI certificate.
 If a server's referee public key changes (e.g., factory reset,
 public key algorithm, key length) the new key needs
 to be enrolled with the Referee and the old key removed. Clients
-will notice the mis-match and will query the Referee.
+will notice the mis-match and will query the Referee.  This
+functionality might be automated; see {{key-lifetime}}.
 
 ## Clients
 
@@ -247,6 +248,7 @@ else clients will need to manually trust individual certificates.
 
 # Security Considerations
 
+
 See {{operational-notes}} describing client behavior when the Referee
 is unavailable.
 
@@ -292,6 +294,16 @@ embedding part/all of the public key into the name itself, for example:
 If we need unique name, we could CNAME from a convenient name
 (printer.internal) to the unique name.
 
+
+## Key Lifetime (Rotating Public Key) {#key-lifetime}
+
+If a server's raw public key changes the new key has to be installed
+into the network's Referee.
+
+To automate such changes, the server could communicate with the
+Referee and prove possession of its (old) private key (using TLS
+client authentication or using application-layer mechanism such as
+JSON Web Signature) to update the Referee to its new public key.
 
 
 # Acknowledgments
