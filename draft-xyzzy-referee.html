@@ -1267,6 +1267,9 @@ the home network.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
                 <p id="section-toc.1-1.10.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-unique-names" class="internal xref">Unique Names</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.4">
+                <p id="section-toc.1-1.10.2.4.1"><a href="#appendix-A.4" class="auto internal xref">A.4</a>.  <a href="#name-key-lifetime-rotating-publi" class="internal xref">Key Lifetime (Rotating Public Key)</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
@@ -1393,7 +1396,8 @@ PKI certificate.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 <p id="section-4.2-4">If a server's referee public key changes (e.g., factory reset,
 public key algorithm, key length) the new key needs
 to be enrolled with the Referee and the old key removed. Clients
-will notice the mis-match and will query the Referee.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+will notice the mis-match and will query the Referee.  This
+functionality might be automated; see <a href="#key-lifetime" class="auto internal xref">Appendix A.4</a>.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="clients">
@@ -1648,6 +1652,19 @@ embedding part/all of the public key into the name itself, for example:<a href="
 </div>
 <p id="appendix-A.3-3">If we need unique name, we could CNAME from a convenient name
 (printer.internal) to the unique name.<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="key-lifetime">
+<section id="appendix-A.4">
+        <h3 id="name-key-lifetime-rotating-publi">
+<a href="#appendix-A.4" class="section-number selfRef">A.4. </a><a href="#name-key-lifetime-rotating-publi" class="section-name selfRef">Key Lifetime (Rotating Public Key)</a>
+        </h3>
+<p id="appendix-A.4-1">If a server's raw public key changes the new key has to be installed
+into the network's Referee.<a href="#appendix-A.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.4-2">To automate such changes, the server could communicate with the
+Referee and prove possession of its (old) private key (using TLS
+client authentication or using application-layer mechanism such as
+JSON Web Signature) to update the Referee to its new public key.<a href="#appendix-A.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
