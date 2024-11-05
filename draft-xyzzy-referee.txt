@@ -132,7 +132,8 @@ Table of Contents
 
              Table 1: Summary of Referee Against Requirements
 
-   (*) Support exists in OpenSSL library [rpk].
+   (*) Support exists in OpenSSL [rpk-openssl] and WolfSSL
+   [rpk-wolfssl].
 
 4.  Operation
 
@@ -327,8 +328,14 @@ Table of Contents
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/rfc/rfc5280>.
 
-   [rpk]      OpenSSL, "RFC7250 (RPK) support", March 2023,
+   [rpk-openssl]
+              OpenSSL, "RFC7250 (RPK) support", March 2023,
               <https://github.com/openssl/openssl/pull/18185>.
+
+   [rpk-wolfssl]
+              WolfSSL, "wolfSSL supports Raw Public Keys", August 2023,
+              <https://www.wolfssl.com/wolfssl-supports-raw-public-
+              keys/>.
 
 Appendix A.  Issues for Further Discussion
 
