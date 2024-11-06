@@ -247,9 +247,12 @@ Table of Contents
    Thus, revoking authentication has immediate effect because the
    clients immediately validate a mismatch with the Referee.
 
-   Upon removal of a server, the Referee can send a revokation broadcast
-   containing the server's public key indicating the clients to drop any
-   active connections with the server.
+   Upon removal of a server, the Referee can send a revocation message
+   containing the server's public key to clients having active
+   connections indicating the clients to drop any active connections
+   with the server.  This message can be sent by making a TLS connection
+   with each client or using a HTTP PUT, which is implementation
+   specific.
 
 4.4.2.  Client Revocation
 
@@ -257,9 +260,12 @@ Table of Contents
    key is removed from the Referee and the client is required to re-
    register with the Referee.
 
-   Upon removal of a client, the Referee can send a revokation broadcast
-   containing the client's public key indicating the clients to drop any
-   active connections with the client.
+   Upon removal of a client, the Referee can send a revocation message
+   containing the client's public key to servers having active
+   connections indicating the servers to drop any active connections
+   with the client.  This message can be sent by making a TLS connection
+   with each server or using a HTTP PUT, which is implementation
+   specific.
 
    The re-registration of client upon revocation could be forced to be
    done manually and is implementation specific.
