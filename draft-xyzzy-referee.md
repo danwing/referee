@@ -245,10 +245,6 @@ signed by a Certification Authority already trusted by the clients, or
 else clients will need to manually trust individual certificates.
 
 
-
-
-
-
 # Security Considerations
 
 
@@ -283,19 +279,34 @@ If there is only one referee, this problem never occurs.
 
 ## Unique Names
 
-Printer.internal or printer.local are handy names.  Are they suitable
-for this system, or do we need site-specific names containing a unique
+Printer.internal or printer.local are handy names.  Unfortunately
+existing browsers have state that is tied to names -- web forms,
+cookies, and passwords.  Thus, we need names that contain a unique
 identifier like a UUID, e.g.,
-printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal?  Or perhaps
+printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal.  Or perhaps
 embedding part/all of the public key into the name itself, for example:
 
 ~~~~~
   printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
   nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
+  router.fb5f73ed-275a-431e-aecf-436f0c54d69d.internal
 ~~~~~
 
-If we need unique name, we could CNAME from a convenient name
-(printer.internal) to the unique name.
+The Referee system is obliviuos to the contents of the unique part
+of the name, so all the devices could use the same site name (also called
+search domain or domain-search), for example:
+
+~~~~~
+  printer.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
+  nas.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
+  router.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
+~~~~~
+
+The Referee system allows keeping the unique name the same for the
+lifetime of the device while allowing changing its public key.
+
+> Note: Is public key security hygiene (changing every NNN days)
+  important enough to build a Referee system?
 
 
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
@@ -333,7 +344,44 @@ With the above technique, the client will only have to (manually)
 re-authenticate the Referee when the Referee cannot perform session
 resumption.
 
+## Incrementatal Adoption
 
+The Referee system requires support of both the client (to ask the
+Referee for mediation), installation of a Referee, and support of
+the server (to support a TLS raw public key).  This section explores
+how to provide some Referee value even when all three systems do
+not (yet) support Referee.
+
+### Server Does Not Support Referee
+
+In the case a server does not support Referee, it will return a PKIX
+certificate in its TLS handshake.  That PKIX certificate might or
+might not be signed by a Certification Authority already trusted by
+the client.  In the case the signing Certification Authority is trusted
+by the client, the TLS connection completes normally.  Otherwise, the
+user is presented with an error.
+
+A Referee system could eliminate that error by connecting to the
+server itself (from the client or from the Referee), extracting the
+public key, and installing the server's name and its public key
+into the Referee.  When a Referee-capable client connects to that
+server and receives a certificate signed by a Certification Authority
+the client does not trust, and that server is on a local domain,
+the client can query the Referee for the server's public key.
+The Referee responds with the server's public key which the
+client compares to the server's public key in the TLS handshake. If
+they match, the client has finished authentication with the
+server.  If they don't match, the client considers the TLS handshake
+to have failed and displays an error.
+
+### Referee Proxy
+
+Have referee proxy HTTPS for simple names (printer.local) and
+terminate those connections itself, solely to issue an HTTP redirect
+to the complex name (HTTP 301).
+
+But this would only work for HTTP.  Other important protocols like
+IPP and SMB do not have a mechanism to redirect a connection.
 
 # Acknowledgments
 {:numbered="false"}
