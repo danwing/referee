@@ -170,6 +170,9 @@ key just obtained.  If they match, communication continues.  If they
 do not match, the client aborts the communication; further actions
 by the client are an implementation detail.
 
+* The expiration time of the cached information can also be determined by the Decider and the
+client refreshes the cache once the expiration time is passed. This gives flexibility to
+schedule the refresh during any time of the day.
 
 ## Revoking Authorization
 
@@ -187,13 +190,13 @@ communication with the server.
 Thus, revoking authentication has immediate effect because the clients
 immediately validate a mismatch with the Referee.
 
-
 # Bootstrapping the Referee {#bootstrapping}
 
 ## Clients to Referee
 
 The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.
+
 
 Until service discovery is defined for a Referee system, the client
 has to be configured to trust the Referee server's public key
@@ -273,7 +276,12 @@ it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
 the server could indicate the server's Referee (akin to
 {{?I-D.beck-tls-trust-anchor-ids}}).
 
-If there is only one referee, this problem never occurs.
+The referees could be configured to share the list of servers and associated
+fingerprints with each other, thereby enabling the clients to communicate with
+any referee. This also improves redundancy in case one of the referees go down.
+
+This section is not applicable when there is only one referee. The scope of
+this draft is only a single referee system.
 
 ## Unique Names
 
@@ -306,7 +314,6 @@ lifetime of the device while allowing changing its public key.
 > Note: Is public key security hygiene (changing every NNN days)
   important enough to build a Referee system?
 
-
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
 
 For security hygiene, the public keys in a server and in the Referee
@@ -324,7 +331,8 @@ JSON Web Signature) and publish its new public key using an HTTP PUT.
 > Note: such a PUT mechanism also means an attacker in possession of
 the server's private key can change the legitimate server's public key
 fingerprint in the Referee to now point at an attacker-controlled
-system, denying access to the legitimate server.
+system, denying access to the legitimate server. It is still better than
+unencrypted connections, which is the case today.
 
 
 ### Referee
