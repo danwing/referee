@@ -1,0 +1,81 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2024-11-07T00:33:28.840559+00:00",
+  "repo": "danwing/referee",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDONKW7Fc6A_9vm",
+      "title": "add text for revocation authorization",
+      "url": "https://github.com/danwing/referee/pull/1",
+      "state": "OPEN",
+      "author": "sridharangirish91",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-11-06T02:44:08Z",
+      "updatedAt": "2024-11-06T15:16:16Z",
+      "baseRepository": "danwing/referee",
+      "baseRefName": "main",
+      "baseRefOid": "d7f90f88b4161d0b17bf80d2845a82bd01b69a05",
+      "headRepository": "danwing/referee",
+      "headRefName": "sridharanr",
+      "headRefOid": "a5ed38e501d7d57db789ecbf9eab17eecce992e8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
