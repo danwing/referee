@@ -17,10 +17,10 @@ keyword:
  - tofu
 
 venue:
-  group: IOTOPS
-  type: Working Group
-  mail: iotops@ietf.org
-  arch: https://mailarchive.ietf.org/arch/browse/iotops/
+  group: SETTLE
+  type: ""
+  mail: settle@ietf.org
+  arch: https://mailarchive.ietf.org/arch/browse/settle/
   github: "danwing/referee"
   latest: "https://danwing.github.io/referee/draft-xyzzy-referee.html"
 
@@ -29,7 +29,7 @@ author:
     ins: D. Wing
     name: Dan Wing
     organization: Cloud Software Group Holdings, Inc.
-    abbrev: Cloud Software Group
+    abbrev: Cloud Software
     email: danwing@gmail.com
 
 
