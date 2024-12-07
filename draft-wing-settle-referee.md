@@ -3,7 +3,7 @@ title: "A Referee to Authenticate Home Servers"
 abbrev: "Referee"
 category: std
 
-docname: draft-xyzzy-referee-latest
+docname: draft-wing-settle-referee-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
