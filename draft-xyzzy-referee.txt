@@ -3,9 +3,9 @@
 
 
 Network Working Group                                            D. Wing
-Internet-Draft                                      Cloud Software Group
-Intended status: Standards Track                         6 November 2024
-Expires: 10 May 2025
+Internet-Draft                                            Cloud Software
+Intended status: Standards Track                         7 December 2024
+Expires: 10 June 2025
 
 
                  A Referee to Authenticate Home Servers
@@ -29,10 +29,10 @@ About This Document
    information for this document may be found at
    https://datatracker.ietf.org/doc/draft-xyzzy-referee/.
 
-   Discussion of this document takes place on the IOTOPS Working Group
-   mailing list (mailto:iotops@ietf.org), which is archived at
-   https://mailarchive.ietf.org/arch/browse/iotops/.  Subscribe at
-   https://www.ietf.org/mailman/listinfo/iotops/.
+   Discussion of this document takes place on the SETTLE mailing list
+   (mailto:settle@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/settle/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/settle/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/danwing/referee.
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 May 2025.
+   This Internet-Draft will expire on 10 June 2025.
 
 Copyright Notice
 
