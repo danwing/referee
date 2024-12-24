@@ -28,8 +28,8 @@ author:
  -
     ins: D. Wing
     name: Dan Wing
-    organization: Cloud Software Group Holdings, Inc.
-    abbrev: Cloud Software
+    organization: Citrix
+    abbrev: Citrix
     email: danwing@gmail.com
 
 
@@ -57,9 +57,9 @@ informative:
 Obtaining and maintaining PKI certificates for devices in a home
 network is difficult for both technical and human factors reasons. This
 document describes an alternative approach to securely identify and
-authenticate home servers using a referee system. The referee allows
+authenticate home servers using a Referee system. The referee allows
 bootstrapping a network of devices by trusting only one system in
-the home network.
+the home network -- the Referee.
 
 --- middle
 
@@ -68,17 +68,15 @@ the home network.
 Most existing TLS communications require the server obtaining a
 certificate signed by a Certification Authority trusted by the client.
 Within a home network this is fraught with complications of both
-human factors and technical nature.
+human factors and technical natures.
 
-This document describes a Referee system, where a Referee is entrusted
-(once) to help clients identify and authenticate (many) servers within
-the home network.  The Referee system purposefully avoids Public Key
-Infrastructure using X.509 {{?PKIX=RFC5280}}.  The TLS handshakes
-only use raw public keys {{!RFC7250}}.
-
-# Conventions and Definitions
-
-{::boilerplate bcp14-tagged}
+This document describes a Referee system to authorize the legitimate
+servers on a local domain.  A server, called a Referee, is entrusted
+to help clients identify and authenticate servers within
+the local domain.  The Referee system purposefully avoids Public Key
+Infrastructure using X.509 {{?PKIX=RFC5280}}.  The certificates that
+might be used for TLS handshake are only used to extract their
+public keys, rather than validating the certificate path.
 
 # Requirements Evaluation
 
@@ -103,10 +101,9 @@ key fingerprints.
 
 The Referee on a local network is named "referee.internal".
 
-Clients authenticate to the Referee using raw public keys (using
-TLS server_certificate_type extension) and use HTTP GET to fetch the named public key fingerprint
-from the Referee server.  For example to get public key fingerprint of
-a server named printer.internal,
+Clients authenticate to the Referee and use HTTP GET to fetch the
+named public key fingerprint from the Referee server.  For example to
+get public key fingerprint of a server named printer.internal,
 
 ~~~~
   GET /.well-known/referee/sha256/printer.internal HTTP/1.1
@@ -115,12 +112,17 @@ a server named printer.internal,
 The public key fingerprint is SHA-256 of the server's public key
 returned as an octet-stream.
 
+The client's initial trust of the Referee is performed by configuration of the
+client.  This might be eventually be eased with service discovery which
+is confirmed by the user when the user first wants to connect to a
+server on a new local domain.
 
 ## Servers
 
 A server supporting this specification is expected to be a printer
-(using IPPS or HTTPS), NAS, IoT device, router (especially its
-HTTPS-based management console or its ssh server), or similar.
+(using IPPS or HTTPS), file server (e.g., NAS or laptop), IoT device,
+router (especially its HTTPS-based management console or its ssh
+server), or similar.
 
 Each in-home device supporting Referee has a fixed public key, which
 persists for the lifetime of the device.  During installation of the
@@ -135,7 +137,7 @@ receives a ClientHello with the raw public key certificate type in the server_ce
 the server responds with its raw public key rather than a
 PKI certificate.
 
-If a server's referee public key changes (e.g., factory reset,
+If a server's Referee public key changes (e.g., factory reset,
 public key algorithm, key length) the new key needs
 to be enrolled with the Referee and the old key removed. Clients
 will notice the mis-match and will query the Referee.  This
@@ -148,11 +150,6 @@ DNS name of its Referee server.  It authenticates to the Referee server
 using one of the bootstrapping mechanisms (see {{bootstrapping}}). This
 step occurs only once for each home network the client joins, as each
 home network is responsible for being a Referee for its own devices.
-
-When connecting to a server with an .internal domain, a client
-supporting this specification includes the TLS server_certificate_type
-extension with the Raw Public Key certificate type {{!RFC7250}} in its
-TLS ClientHello.
 
 For the client, there are two situations that may occur:  it has
 not previously cached the association of hostname to public key or it
@@ -198,11 +195,10 @@ immediately validate a mismatch with the Referee.
 The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.
 
-The client uses the raw public key certificate type (using TLS server_certificate_type extension) to access the
-Referee server itself. This means the client has to be configured
-to trust the Referee server's public key fingerprint.
-
-This can be done manually or using TOFU, and is implementation specific.
+Until service discovery is defined for a Referee system, the client
+has to be configured to trust the Referee server's public key
+fingerprint.  This can be done manually or using TOFU, and is
+implementation specific.
 
 > for discussion: To reduce initial bootstrap for client, perhaps use SVCB for
   client to bootstrap its first Referee?  This effectively achieves
@@ -250,6 +246,8 @@ else clients will need to manually trust individual certificates.
 
 See {{operational-notes}} describing client behavior when the Referee
 is unavailable.
+
+
 
 
 # IANA Considerations
@@ -311,28 +309,30 @@ lifetime of the device while allowing changing its public key.
 
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
 
-For security hygiene, the raw public keys in a server and in the Referee
+For security hygiene, the public keys in a server and in the Referee
 are occasionally changed. This section discusses how such changes are
 handled by a Referee system.
 
 ### Server
 
-If a server's raw public key changes the new key has to be installed
+If a server's public key changes the new key has to be installed
 into the network's Referee.  To automate such changes, the server could connect to the
 Referee and prove possession of its (old) private key (using TLS
 client authentication or using application-layer mechanism such as
 JSON Web Signature) and publish its new public key using an HTTP PUT.
 
-> Note: such a PUT mechanism also means an attacker in possession of the server's private
-key can change that server's public key fingerprint in the Referee.
+> Note: such a PUT mechanism also means an attacker in possession of
+the server's private key can change the legitimate server's public key
+fingerprint in the Referee to now point at an attacker-controlled
+system, denying access to the legitimate server.
 
 
 ### Referee
 
-If the Referee's raw public key changes all the clients have to
+If the Referee's public key changes all the clients have to
 re-authenticate the Referee's new raw public key.  This is uncool.
 
-To allow changing the Referee's raw public key without client
+To allow changing the Referee's public key without client
 re-authentication, the client and Referee could do session resumption
 for its subsequent connections to the Referee (Section 2.2 of
 {{?RFC8446}}).  When doing session resumption with the Referee, the
@@ -347,44 +347,27 @@ resumption.
 ## Incrementatal Adoption
 
 The Referee system requires support of both the client (to ask the
-Referee for mediation), installation of a Referee, and support of
-the server (to support a TLS raw public key).  This section explores
-how to provide some Referee value even when all three systems do
-not (yet) support Referee.
+Referee for mediation) and installation of a Referee -- which could be
+in the home router, NAS, or other always-on device.  This section
+explores how to bootstrap Referee system even when the server does
+not (yet) suppor Referee.
+
 
 ### Server Does Not Support Referee
 
-In the case a server does not support Referee, it will return a PKIX
-certificate in its TLS handshake.  That PKIX certificate might or
-might not be signed by a Certification Authority already trusted by
-the client.  In the case the signing Certification Authority is trusted
-by the client, the TLS connection completes normally.  Otherwise, the
-user is presented with an error.
+In the case a server does not support Referee, it will not
+register itself with the network's Referee.
 
-A Referee system could eliminate that error by connecting to the
-server itself (from the client or from the Referee), extracting the
-public key, and installing the server's name and its public key
-into the Referee.  When a Referee-capable client connects to that
+The Referee could be told by a network administrator to connect to
+such a server, extract public key, and install that public key and
+name into the Referee. When a Referee-capable client connects to that
 server and receives a certificate signed by a Certification Authority
-the client does not trust, and that server is on a local domain,
-the client can query the Referee for the server's public key.
-The Referee responds with the server's public key which the
-client compares to the server's public key in the TLS handshake. If
-they match, the client has finished authentication with the
-server.  If they don't match, the client considers the TLS handshake
-to have failed and displays an error.
+the client does not trust, and that server is on a local domain, the
+client can query the Referee for the server's public key.  The Referee
+responds with the server's public key which the client compares to the
+server's public key in the TLS handshake. If they match, the client
+has finished authentication with the server.  If they don't match, the
+client considers the TLS handshake to have failed and displays an
+error.
 
-### Referee Proxy
-
-Have referee proxy HTTPS for simple names (printer.local) and
-terminate those connections itself, solely to issue an HTTP redirect
-to the complex name (HTTP 301).
-
-But this would only work for HTTP.  Other important protocols like
-IPP and SMB do not have a mechanism to redirect a connection.
-
-# Acknowledgments
-{:numbered="false"}
-
-TODO acknowledge.
 
