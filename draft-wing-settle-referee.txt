@@ -4,8 +4,8 @@
 
 Network Working Group                                            D. Wing
 Internet-Draft                                                    Citrix
-Intended status: Standards Track                        24 December 2024
-Expires: 27 June 2025
+Intended status: Standards Track                        26 December 2024
+Expires: 29 June 2025
 
 
                  A Referee to Authenticate Home Servers
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 June 2025.
+   This Internet-Draft will expire on 29 June 2025.
 
 Copyright Notice
 
@@ -179,7 +179,7 @@ Table of Contents
 
    If a server's Referee public key changes (e.g., factory reset, public
    key algorithm, key length) the new key needs to be enrolled with the
-   Referee and the old key removed.  Clients will notice the mis-match
+   Referee and the old key removed.  Clients will notice the mismatch
    and will query the Referee.  This functionality might be automated;
    see Appendix A.4.
 
@@ -343,7 +343,8 @@ Appendix A.  Issues for Further Discussion
 A.1.  PKI Fallback
 
    Currently the text suggests clients should fallback to PKI if Referee
-   validation fails.  But is such fallback harmful or is it worthwhile?
+   validation fails.  This means certificate warnings for self-signed
+   certificates.  Is such fallback harmful or is it worthwhile?
 
 A.2.  Multiple Networks: Multiple Referees
 
@@ -351,7 +352,9 @@ A.2.  Multiple Networks: Multiple Referees
    networks), how does client know which Referee to use for the network
    it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
    the server could indicate the server's Referee (akin to
-   [I-D.beck-tls-trust-anchor-ids]).
+   [I-D.beck-tls-trust-anchor-ids]).  Probably want to do service
+   discovery to find the network's referee and validate if the
+   (discovered) referee is an already-known referee.
 
    If there is only one referee, this problem never occurs.
 
@@ -425,7 +428,7 @@ A.5.  Incrementatal Adoption
    Referee for mediation) and installation of a Referee -- which could
    be in the home router, NAS, or other always-on device.  This section
    explores how to bootstrap Referee system even when the server does
-   not (yet) suppor Referee.
+   not (yet) support Referee.
 
 A.5.1.  Server Does Not Support Referee
 
@@ -448,4 +451,5 @@ Author's Address
 
    Dan Wing
    Citrix
+   United States of America
    Email: danwing@gmail.com
