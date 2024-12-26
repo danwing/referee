@@ -174,7 +174,7 @@ by the client are an implementation detail.
 
 ## Revoking Authorization
 
-When the administrator revoke authorization for a server (e.g., replacement
+When the administrator revokes authorization for a server (e.g., replacement
 of a printer), the administrator removes the old public key from the Referee
 and installs the new key in the Referee.
 
