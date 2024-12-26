@@ -31,6 +31,7 @@ author:
     organization: Citrix
     abbrev: Citrix
     email: danwing@gmail.com
+    country: United States of America
 
 
 normative:
@@ -140,7 +141,7 @@ PKI certificate.
 If a server's Referee public key changes (e.g., factory reset,
 public key algorithm, key length) the new key needs
 to be enrolled with the Referee and the old key removed. Clients
-will notice the mis-match and will query the Referee.  This
+will notice the mismatch and will query the Referee.  This
 functionality might be automated; see {{key-lifetime}}.
 
 ## Clients
@@ -263,7 +264,8 @@ Register new .well_known URI for "referee".
 ## PKI Fallback
 
 Currently the text suggests clients should fallback to PKI if Referee
-validation fails.  But is such fallback harmful or is it worthwhile?
+validation fails.  This means certificate warnings for self-signed
+certificates.  Is such fallback harmful or is it worthwhile?
 
 ## Multiple Networks: Multiple Referees
 
@@ -271,7 +273,9 @@ If client has multiple Referees configured (due to visiting multiple
 networks), how does client know which Referee to use for the network
 it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
 the server could indicate the server's Referee (akin to
-{{?I-D.beck-tls-trust-anchor-ids}}).
+{{?I-D.beck-tls-trust-anchor-ids}}).  Probably want to do service
+discovery to find the network's referee and validate if the (discovered)
+referee is an already-known referee.
 
 If there is only one referee, this problem never occurs.
 
@@ -350,7 +354,7 @@ The Referee system requires support of both the client (to ask the
 Referee for mediation) and installation of a Referee -- which could be
 in the home router, NAS, or other always-on device.  This section
 explores how to bootstrap Referee system even when the server does
-not (yet) suppor Referee.
+not (yet) support Referee.
 
 
 ### Server Does Not Support Referee
