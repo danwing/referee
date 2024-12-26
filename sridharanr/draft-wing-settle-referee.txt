@@ -121,17 +121,15 @@ Table of Contents
    Using requirements from [I-D.rbw-home-servers], the proposal in this
    document has the following summarized characteristics:
 
-   +=============+========+===========+============+==========+========+
-   |    Solution | Reduce | Eliminate |  Existing  | Existing | Revoke |
-   |             |   CA   |     CA    |     CA     |  Client  |  Auth  |
-   |             |        |           |  Support   | Support  |        |
-   +=============+========+===========+============+==========+========+
-   |     Referee |  Yes   |    Yes    |    N/A     | Some (*) |  Yes   |
-   | (raw public |        |           |            |          |        |
-   |       keys) |        |           |            |          |        |
-   +-------------+--------+-----------+------------+----------+--------+
+    +==========+========+===========+============+==========+========+
+    | Solution | Reduce | Eliminate |  Existing  | Existing | Revoke |
+    |          |   CA   |     CA    | CA Support |  Client  |  Auth  |
+    |          |        |           |            | Support  |        |
+    +==========+========+===========+============+==========+========+
+    |  Referee |  Yes   |    Yes    |    N/A     | Some (*) |  Yes   |
+    +----------+--------+-----------+------------+----------+--------+
 
-              Table 1: Summary of Referee Against Requirements
+             Table 1: Summary of Referee Against Requirements
 
    (*) Support exists in OpenSSL [rpk-openssl] and WolfSSL
    [rpk-wolfssl].
