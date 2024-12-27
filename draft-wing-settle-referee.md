@@ -1,5 +1,5 @@
 ---
-title: "A Referee to Authenticate Home Servers"
+title: "A Referee to Authenticate Servers in Local Domains"
 abbrev: "Referee"
 category: std
 
@@ -60,7 +60,7 @@ network is difficult for both technical and human factors reasons. This
 document describes an alternative approach to securely identify and
 authenticate home servers using a Referee system. The referee allows
 bootstrapping a network of devices by trusting only one system in
-the home network -- the Referee.
+a local domain -- the Referee.
 
 --- middle
 
@@ -75,9 +75,17 @@ This document describes a Referee system to authorize the legitimate
 servers on a local domain.  A server, called a Referee, is entrusted
 to help clients identify and authenticate servers within
 the local domain.  The Referee system purposefully avoids Public Key
-Infrastructure using X.509 {{?PKIX=RFC5280}}.  The certificates that
-might be used for TLS handshake are only used to extract their
-public keys, rather than validating the certificate path.
+Infrastructure using X.509 {{?PKIX=RFC5280}}, instead using an
+"allowlist" of public keys.
+
+When clients connect to a server on the local domain and encounter
+a self-signed certificate that might otherwise cause an authentication
+failure (typically, a warning to the user), the client can query the
+local domain's pre-authorized Referee system to learn if that server
+has been enrolled with the Referee.  If so, the connection can continue --
+much as a certificate signed by a trusted Certification Authority would
+continue.
+
 
 # Requirements Evaluation
 
@@ -152,24 +160,30 @@ using one of the bootstrapping mechanisms (see {{bootstrapping}}). This
 step occurs only once for each home network the client joins, as each
 home network is responsible for being a Referee for its own devices.
 
-For the client, there are two situations that may occur:  it has
-not previously cached the association of hostname to public key or it
-has cached that information.
+On a connection to a server on the local domain (see {{local}}) there
+are two situations that may occur: the client has not previously cached the
+association of hostname to public key or it has cached that
+information.
 
-* If not previously cached, the client queries that network's Referee with the
-DNS name of the server (e.g., printer.internal).  The Referee responds
-with the public key fingerprint of that server.  The client checks if
-the public key fingerprint (from the Referee) matches the public key
-of the server (from the TLS handshake). If they match, communication
-with the server continues.  The server MAY also cache the server name
-and public key.  If they do not match, the client aborts this
-communication session; further actions by the client are an
-implementation detail.
+* If not previously cached, the client queries that network's Referee
+with the DNS name of the server (e.g., printer.internal).  The Referee
+responds with the public key fingerprint of that server.  The client
+checks if the public key fingerprint (from the Referee) matches the
+public key of the server (from the TLS handshake). If they match,
+communication with the server continues and the server name and its
+public key MAY be cached by the client.  If they do not match, the
+client aborts this communication session; further actions by the
+client are an implementation detail.
 
-* If previously cached, the client determines if the cached public key matches the public
-key just obtained.  If they match, communication continues.  If they
-do not match, the client aborts the communication; further actions
-by the client are an implementation detail.
+* If previously cached, the client determines if the cached public key
+matches the public key obtained from the TLS handshake with the
+server.  If they match, communication continues.  If they do not
+match, the queries the Referee to learn if a new key fingerprint is
+available for that server.  If a different fingerprint is returned by
+the Referee, the client verifies it matches the public key from the
+TLS handshake.  If they match, the client replaces the information in
+its cache.
+
 
 
 ## Revoking Authorization
@@ -228,6 +242,34 @@ administrator to the Referee's management GUI or CLI.
 A client device which leans the Referee does not have an existing
 entry for a (new) name is authorized to 'push' the (new) name and
 its public key fingerprint to the Referee.
+
+
+
+# Identifying Servers as Local {#local}
+
+This section defines the domain names and IP addresses considered
+"local".
+
+## Local Domain Names
+
+The following domain name suffixes are considered "local":
+
+* ".local" (from {{?mDNS=RFC6762}})
+* ".home-arpa" (from {{?Homenet=RFC8375}})
+* ".internal" (from {{?I-D.davies-internal-tld}})
+* both ".localhost" and "localhost" (Section 6.3 of {{?RFC6761}})
+
+## Local IP Addresses
+
+Additionally, if any host resolves to a local IP address and
+connection is made to that address, those are also considered
+"local":
+
+* 10/8, 172.16/12, and 192.168/16 (from {{?RFC1918}})
+* 169.254/16 and fe80::/10 (from {{?RFC3927}} and {{?RFC4291}})
+* fc00::/7 (from {{?RFC4193}})
+* 127/8 and ::1/128 (from {{Section 3.2.1.3 of ?RFC1122}} and {{?RFC4291}})
+
 
 # Operational Notes {#operational-notes}
 
