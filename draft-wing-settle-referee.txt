@@ -4,11 +4,11 @@
 
 Network Working Group                                            D. Wing
 Internet-Draft                                                    Citrix
-Intended status: Standards Track                        26 December 2024
-Expires: 29 June 2025
+Intended status: Standards Track                        27 December 2024
+Expires: 30 June 2025
 
 
-                 A Referee to Authenticate Home Servers
+           A Referee to Authenticate Servers in Local Domains
                     draft-wing-settle-referee-latest
 
 Abstract
@@ -18,7 +18,7 @@ Abstract
    This document describes an alternative approach to securely identify
    and authenticate home servers using a Referee system.  The referee
    allows bootstrapping a network of devices by trusting only one system
-   in the home network -- the Referee.
+   in a local domain -- the Referee.
 
 About This Document
 
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 June 2025.
+   This Internet-Draft will expire on 30 June 2025.
 
 Copyright Notice
 
@@ -82,12 +82,15 @@ Table of Contents
      4.2.  Servers to Referee
        4.2.1.  Short Code or Scan Code
        4.2.2.  TOFU
-   5.  Operational Notes
-   6.  Security Considerations
-   7.  IANA Considerations
-   8.  References
-     8.1.  Normative References
-     8.2.  Informative References
+   5.  Identifying Servers as Local
+     5.1.  Local Domain Names
+     5.2.  Local IP Addresses
+   6.  Operational Notes
+   7.  Security Considerations
+   8.  IANA Considerations
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
    Appendix A.  Issues for Further Discussion
      A.1.  PKI Fallback
      A.2.  Multiple Networks: Multiple Referees
@@ -110,9 +113,16 @@ Table of Contents
    servers on a local domain.  A server, called a Referee, is entrusted
    to help clients identify and authenticate servers within the local
    domain.  The Referee system purposefully avoids Public Key
-   Infrastructure using X.509 [PKIX].  The certificates that might be
-   used for TLS handshake are only used to extract their public keys,
-   rather than validating the certificate path.
+   Infrastructure using X.509 [PKIX], instead using an "allowlist" of
+   public keys.
+
+   When clients connect to a server on the local domain and encounter a
+   self-signed certificate that might otherwise cause an authentication
+   failure (typically, a warning to the user), the client can query the
+   local domain's pre-authorized Referee system to learn if that server
+   has been enrolled with the Referee.  If so, the connection can
+   continue -- much as a certificate signed by a trusted Certification
+   Authority would continue.
 
 2.  Requirements Evaluation
 
@@ -192,9 +202,10 @@ Table of Contents
    each home network is responsible for being a Referee for its own
    devices.
 
-   For the client, there are two situations that may occur: it has not
-   previously cached the association of hostname to public key or it has
-   cached that information.
+   On a connection to a server on the local domain (see Section 5) there
+   are two situations that may occur: the client has not previously
+   cached the association of hostname to public key or it has cached
+   that information.
 
    *  If not previously cached, the client queries that network's
       Referee with the DNS name of the server (e.g., printer.internal).
@@ -202,16 +213,19 @@ Table of Contents
       server.  The client checks if the public key fingerprint (from the
       Referee) matches the public key of the server (from the TLS
       handshake).  If they match, communication with the server
-      continues.  The server MAY also cache the server name and public
-      key.  If they do not match, the client aborts this communication
-      session; further actions by the client are an implementation
-      detail.
+      continues and the server name and its public key MAY be cached by
+      the client.  If they do not match, the client aborts this
+      communication session; further actions by the client are an
+      implementation detail.
 
    *  If previously cached, the client determines if the cached public
-      key matches the public key just obtained.  If they match,
-      communication continues.  If they do not match, the client aborts
-      the communication; further actions by the client are an
-      implementation detail.
+      key matches the public key obtained from the TLS handshake with
+      the server.  If they match, communication continues.  If they do
+      not match, the queries the Referee to learn if a new key
+      fingerprint is available for that server.  If a different
+      fingerprint is returned by the Referee, the client verifies it
+      matches the public key from the TLS handshake.  If they match, the
+      client replaces the information in its cache.
 
 3.4.  Revoking Authorization
 
@@ -271,7 +285,39 @@ Table of Contents
    entry for a (new) name is authorized to 'push' the (new) name and its
    public key fingerprint to the Referee.
 
-5.  Operational Notes
+5.  Identifying Servers as Local
+
+   This section defines the domain names and IP addresses considered
+   "local".
+
+5.1.  Local Domain Names
+
+   The following domain name suffixes are considered "local":
+
+   *  ".local" (from [mDNS])
+
+   *  ".home-arpa" (from [Homenet])
+
+   *  ".internal" (from [I-D.davies-internal-tld])
+
+   *  both ".localhost" and "localhost" (Section 6.3 of [RFC6761])
+
+5.2.  Local IP Addresses
+
+   Additionally, if any host resolves to a local IP address and
+   connection is made to that address, those are also considered
+   "local":
+
+   *  10/8, 172.16/12, and 192.168/16 (from [RFC1918])
+
+   *  169.254/16 and fe80::/10 (from [RFC3927] and [RFC4291])
+
+   *  fc00::/7 (from [RFC4193])
+
+   *  127/8 and ::1/128 (from Section 3.2.1.3 of [RFC1122] and
+      [RFC4291])
+
+6.  Operational Notes
 
    The Referee has to always be available.  The client cache helps
    reduce load on the Referee but new clients (e.g., new devices, guest
@@ -283,18 +329,18 @@ Table of Contents
    by a Certification Authority already trusted by the clients, or else
    clients will need to manually trust individual certificates.
 
-6.  Security Considerations
+7.  Security Considerations
 
-   See Section 5 describing client behavior when the Referee is
+   See Section 6 describing client behavior when the Referee is
    unavailable.
 
-7.  IANA Considerations
+8.  IANA Considerations
 
    Register new .well_known URI for "referee".
 
-8.  References
+9.  References
 
-8.1.  Normative References
+9.1.  Normative References
 
    [RFC7250]  Wouters, P., Ed., Tschofenig, H., Ed., Gilmore, J.,
               Weiler, S., and T. Kivinen, "Using Raw Public Keys in
@@ -302,7 +348,11 @@ Table of Contents
               Layer Security (DTLS)", RFC 7250, DOI 10.17487/RFC7250,
               June 2014, <https://www.rfc-editor.org/rfc/rfc7250>.
 
-8.2.  Informative References
+9.2.  Informative References
+
+   [Homenet]  Pfister, P. and T. Lemon, "Special-Use Domain
+              'home.arpa.'", RFC 8375, DOI 10.17487/RFC8375, May 2018,
+              <https://www.rfc-editor.org/rfc/rfc8375>.
 
    [I-D.beck-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
@@ -310,6 +360,13 @@ Table of Contents
               Draft, draft-beck-tls-trust-anchor-ids-03, 18 December
               2024, <https://datatracker.ietf.org/doc/html/draft-beck-
               tls-trust-anchor-ids-03>.
+
+   [I-D.davies-internal-tld]
+              Davies, K. and A. McConachie, "A Top-level Domain for
+              Private Use", Work in Progress, Internet-Draft, draft-
+              davies-internal-tld-01, 18 October 2024,
+              <https://datatracker.ietf.org/doc/html/draft-davies-
+              internal-tld-01>.
 
    [I-D.rbw-home-servers]
               Reddy.K, T., Boucadair, M., and D. Wing, "Identifying and
@@ -319,11 +376,42 @@ Table of Contents
               <https://datatracker.ietf.org/doc/html/draft-rbw-home-
               servers-00>.
 
+   [mDNS]     Cheshire, S. and M. Krochmal, "Multicast DNS", RFC 6762,
+              DOI 10.17487/RFC6762, February 2013,
+              <https://www.rfc-editor.org/rfc/rfc6762>.
+
    [PKIX]     Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/rfc/rfc5280>.
+
+   [RFC1122]  Braden, R., Ed., "Requirements for Internet Hosts -
+              Communication Layers", STD 3, RFC 1122,
+              DOI 10.17487/RFC1122, October 1989,
+              <https://www.rfc-editor.org/rfc/rfc1122>.
+
+   [RFC1918]  Rekhter, Y., Moskowitz, B., Karrenberg, D., de Groot, G.
+              J., and E. Lear, "Address Allocation for Private
+              Internets", BCP 5, RFC 1918, DOI 10.17487/RFC1918,
+              February 1996, <https://www.rfc-editor.org/rfc/rfc1918>.
+
+   [RFC3927]  Cheshire, S., Aboba, B., and E. Guttman, "Dynamic
+              Configuration of IPv4 Link-Local Addresses", RFC 3927,
+              DOI 10.17487/RFC3927, May 2005,
+              <https://www.rfc-editor.org/rfc/rfc3927>.
+
+   [RFC4193]  Hinden, R. and B. Haberman, "Unique Local IPv6 Unicast
+              Addresses", RFC 4193, DOI 10.17487/RFC4193, October 2005,
+              <https://www.rfc-editor.org/rfc/rfc4193>.
+
+   [RFC4291]  Hinden, R. and S. Deering, "IP Version 6 Addressing
+              Architecture", RFC 4291, DOI 10.17487/RFC4291, February
+              2006, <https://www.rfc-editor.org/rfc/rfc4291>.
+
+   [RFC6761]  Cheshire, S. and M. Krochmal, "Special-Use Domain Names",
+              RFC 6761, DOI 10.17487/RFC6761, February 2013,
+              <https://www.rfc-editor.org/rfc/rfc6761>.
 
    [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
