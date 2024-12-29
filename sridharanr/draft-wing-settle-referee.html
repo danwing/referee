@@ -1610,7 +1610,8 @@ the server could indicate the server's Referee (akin to
 <p id="appendix-A.2-2">The referees could be configured to share the list of servers and associated
 fingerprints with each other, thereby enabling the clients to communicate with
 any referee. This also improves redundancy in case one of the referees go down.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
-<p id="appendix-A.2-3">This section is not applicable when there is only one referee.<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-3">This section is not applicable when there is only one referee. The scope of
+this draft is only a single referee system.<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="unique-names">
@@ -1674,7 +1675,8 @@ JSON Web Signature) and publish its new public key using an HTTP PUT.<a href="#a
               <p id="appendix-A.4.1-2.1.1">Note: such a PUT mechanism also means an attacker in possession of
 the server's private key can change the legitimate server's public key
 fingerprint in the Referee to now point at an attacker-controlled
-system, denying access to the legitimate server.<a href="#appendix-A.4.1-2.1.1" class="pilcrow">¶</a></p>
+system, denying access to the legitimate server. It is still better than
+unencrypted connections, which is the case today.<a href="#appendix-A.4.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>

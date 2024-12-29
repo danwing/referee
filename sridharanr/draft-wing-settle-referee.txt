@@ -363,7 +363,8 @@ A.2.  Multiple Networks: Multiple Referees
    to communicate with any referee.  This also improves redundancy in
    case one of the referees go down.
 
-   This section is not applicable when there is only one referee.
+   This section is not applicable when there is only one referee.  The
+   scope of this draft is only a single referee system.
 
 A.3.  Unique Names
 
@@ -410,7 +411,9 @@ A.4.1.  Server
       Note: such a PUT mechanism also means an attacker in possession of
       the server's private key can change the legitimate server's public
       key fingerprint in the Referee to now point at an attacker-
-      controlled system, denying access to the legitimate server.
+      controlled system, denying access to the legitimate server.  It is
+      still better than unencrypted connections, which is the case
+      today.
 
 A.4.2.  Referee
 
