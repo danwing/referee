@@ -1,6 +1,6 @@
 ---
 title: "A Referee to Authenticate Servers in Local Domains"
-abbrev: "Referee"
+abbrev: "Local Domain Referee"
 category: std
 
 docname: draft-wing-settle-referee-latest
@@ -37,21 +37,7 @@ author:
 normative:
 
 informative:
-  rpk-openssl:
-     title: "RFC7250 (RPK) support"
-     author:
-       org: OpenSSL
-       name:
-     date: March 2023
-     target: https://github.com/openssl/openssl/pull/18185
 
-  rpk-wolfssl:
-     title: "wolfSSL supports Raw Public Keys"
-     author:
-       org: WolfSSL
-       name:
-     date: August 2023
-     target: https://www.wolfssl.com/wolfssl-supports-raw-public-keys/
 
 --- abstract
 
@@ -94,10 +80,9 @@ document has the following summarized characteristics:
 
 |    Solution                 | Reduce CA             | Eliminate CA     | Existing CA Support | Existing Client Support | Revoke Auth |
 |----------------------------:|:---------------------:|:----------------:|:-------------------:|:-----------------------:|:-----------:|
-| Referee                     | Yes                   |  Yes             |   N/A               |   Some (*)              |   Yes       |
+| Referee                     | Yes                   |  Yes             |   N/A               |   No                    |   Yes       |
 {: #table1 title="Summary of Referee Against Requirements"}
 
-(*) Support exists in OpenSSL {{rpk-openssl}} and WolfSSL {{rpk-wolfssl}}.
 
 # Operation
 
@@ -121,11 +106,6 @@ get public key fingerprint of a server named printer.internal,
 The public key fingerprint is SHA-256 of the server's public key
 returned as an octet-stream.
 
-The client's initial trust of the Referee is performed by configuration of the
-client.  This might be eventually be eased with service discovery which
-is confirmed by the user when the user first wants to connect to a
-server on a new local domain.
-
 ## Servers
 
 A server supporting this specification is expected to be a printer
@@ -138,13 +118,6 @@ persists for the lifetime of the device.  During installation of the
 device to a Referee network, the device's hostname and public key
 fingerprint are stored into the Referee Server.  Several options
 exist for this step, detailed in {{bootstrapping}}.
-
-A server supporting this specification needs to support raw public
-keys with the server_certificate_type extension ({{!RFC7250}}). As
-detailed in {{!RFC7250}}, when the server
-receives a ClientHello with the raw public key certificate type in the server_certificate_type extension
-the server responds with its raw public key rather than a
-PKI certificate.
 
 If a server's Referee public key changes (e.g., factory reset,
 public key algorithm, key length) the new key needs
@@ -184,7 +157,14 @@ the Referee, the client verifies it matches the public key from the
 TLS handshake.  If they match, the client replaces the information in
 its cache.
 
-
+Internally a client might form a unique identity for a local domain
+server as hostname (e.g., printer.local) combined with the identity
+of the Referee, such as the Referee's public key fingerprint.  In this
+way, when the client is on a different network (which will have a
+different Referee), a server name collision (e.g., local.printer) will
+result in a unique internal identity for that server -- keeping all
+the server-specific data separate (e.g., web forms, passwords, local
+storage, etc.).
 
 ## Revoking Authorization
 
@@ -201,7 +181,6 @@ communication with the server.
 
 Thus, revoking authentication has immediate effect because the clients
 immediately validate a mismatch with the Referee.
-
 
 # Bootstrapping the Referee {#bootstrapping}
 
@@ -286,6 +265,7 @@ else clients will need to manually trust individual certificates.
 
 # Security Considerations
 
+TODO: expand security considerations.
 
 See {{operational-notes}} describing client behavior when the Referee
 is unavailable.
@@ -312,23 +292,23 @@ certificates.  Is such fallback harmful or is it worthwhile?
 ## Multiple Networks: Multiple Referees
 
 If client has multiple Referees configured (due to visiting multiple
-networks), how does client know which Referee to use for the network
-it has joined?  If SSID, wither Ethernet?  Maybe during TLS handshake
-the server could indicate the server's Referee (akin to
-{{?I-D.beck-tls-trust-anchor-ids}}).  Probably want to do service
-discovery to find the network's referee and validate if the (discovered)
-referee is an already-known referee.
+networks), it is anticipated the client would do service discovery to
+find the network's referee and validate if the (discovered) referee is
+an already-known referee -- akin to {{?DNR=RFC9463}}.
 
-If there is only one referee, this problem never occurs.
+If the client only knows of one referee, this problem never occurs.
 
 ## Unique Names
 
-Printer.internal or printer.local are handy names.  Unfortunately
-existing browsers have state that is tied to names -- web forms,
-cookies, and passwords.  Thus, we need names that contain a unique
-identifier like a UUID, e.g.,
+Printer.internal or printer.local are handy names and can be used
+with a Referee system.
+
+Unfortunately existing browsers have state that is tied to names --
+web forms, cookies, and passwords.  Thus, those existing systems need names that contain a
+unique identifier like a UUID, e.g.,
 printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal.  Or perhaps
-embedding part/all of the public key into the name itself, for example:
+embedding part/all of the public key into the name itself, for
+example:
 
 ~~~~~
   printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
@@ -336,9 +316,11 @@ embedding part/all of the public key into the name itself, for example:
   router.fb5f73ed-275a-431e-aecf-436f0c54d69d.internal
 ~~~~~
 
-The Referee system is obliviuos to the contents of the unique part
-of the name, so all the devices could use the same site name (also called
-search domain or domain-search), for example:
+The Referee system is ambilvalnt about the name -- the Referee's name
+and each server's name need only be unique on the current local
+domain. Name collisions that occur between local domains are handled
+by the client querying the other network's trusted Referee to check
+legitimacy.
 
 ~~~~~
   printer.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
@@ -349,9 +331,8 @@ search domain or domain-search), for example:
 The Referee system allows keeping the unique name the same for the
 lifetime of the device while allowing changing its public key.
 
-> Note: Is public key security hygiene (changing every NNN days)
-  important enough to build a Referee system?
-
+The client can uniquely identify a server by the public key of
+that network's Referee combined with the server hostname.
 
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
 
@@ -376,7 +357,7 @@ system, denying access to the legitimate server.
 ### Referee
 
 If the Referee's public key changes all the clients have to
-re-authenticate the Referee's new raw public key.  This is uncool.
+re-authenticate the Referee's new public key.  This is uncool.
 
 To allow changing the Referee's public key without client
 re-authentication, the client and Referee could do session resumption
@@ -416,4 +397,9 @@ has finished authentication with the server.  If they don't match, the
 client considers the TLS handshake to have failed and displays an
 error.
 
+
+# Acknowledgments
+{:numbered="false"}
+
+Thanks to Sridharan Rajagopalan for reviews and feedback.
 
