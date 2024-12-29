@@ -91,13 +91,14 @@ Table of Contents
    9.  Informative References
    Appendix A.  Issues for Further Discussion
      A.1.  PKI Fallback
-     A.2.  Multiple Networks: Multiple Referees
-     A.3.  Unique Names
-     A.4.  Key Lifetime (Rotating Public Key)
-       A.4.1.  Server
-       A.4.2.  Referee
-     A.5.  Incrementatal Adoption
-       A.5.1.  Server Does Not Support Referee
+     A.2.  Multiple Referees on Separate Local Domains
+     A.3.  Redundant Referees on one Local Domain
+     A.4.  Unique Names
+     A.5.  Key Lifetime (Rotating Public Key)
+       A.5.1.  Server
+       A.5.2.  Referee
+     A.6.  Incrementatal Adoption
+       A.6.1.  Server Does Not Support Referee
    Acknowledgments
    Author's Address
 
@@ -175,7 +176,7 @@ Table of Contents
    key algorithm, key length) the new key needs to be enrolled with the
    Referee and the old key removed.  Clients will notice the mismatch
    and will query the Referee.  This functionality might be automated;
-   see Appendix A.4.
+   see Appendix A.5.
 
 3.3.  Clients
 
@@ -257,7 +258,7 @@ Table of Contents
       attacker advertise itself as the Referee and to maintain its
       status as Referee.
 
-      for discussion: see Appendix A.4 regarding Referee key lifetime.
+      for discussion: see Appendix A.5 regarding Referee key lifetime.
 
 4.2.  Servers to Referee
 
@@ -409,7 +410,7 @@ A.1.  PKI Fallback
    validation fails.  This means certificate warnings for self-signed
    certificates.  Is such fallback harmful or is it worthwhile?
 
-A.2.  Multiple Networks: Multiple Referees
+A.2.  Multiple Referees on Separate Local Domains
 
    If client has multiple Referees configured (due to visiting multiple
    networks), it is anticipated the client would do service discovery to
@@ -418,7 +419,13 @@ A.2.  Multiple Networks: Multiple Referees
 
    If the client only knows of one referee, this problem never occurs.
 
-A.3.  Unique Names
+A.3.  Redundant Referees on one Local Domain
+
+   This draft only discusses a single Referee on each Local Domain.
+   Multiple Referees may well be desirable for redundancy but are out of
+   scope of this draft.
+
+A.4.  Unique Names
 
    Printer.internal or printer.local are handy names and can be used
    with a Referee system.
@@ -450,13 +457,13 @@ A.3.  Unique Names
    The client can uniquely identify a server by the public key of that
    network's Referee combined with the server hostname.
 
-A.4.  Key Lifetime (Rotating Public Key)
+A.5.  Key Lifetime (Rotating Public Key)
 
    For security hygiene, the public keys in a server and in the Referee
    are occasionally changed.  This section discusses how such changes
    are handled by a Referee system.
 
-A.4.1.  Server
+A.5.1.  Server
 
    If a server's public key changes the new key has to be installed into
    the network's Referee.  To automate such changes, the server could
@@ -470,7 +477,7 @@ A.4.1.  Server
       key fingerprint in the Referee to now point at an attacker-
       controlled system, denying access to the legitimate server.
 
-A.4.2.  Referee
+A.5.2.  Referee
 
    If the Referee's public key changes all the clients have to re-
    authenticate the Referee's new public key.  This is uncool.
@@ -487,7 +494,7 @@ A.4.2.  Referee
    authenticate the Referee when the Referee cannot perform session
    resumption.
 
-A.5.  Incrementatal Adoption
+A.6.  Incrementatal Adoption
 
    The Referee system requires support of both the client (to ask the
    Referee for mediation) and installation of a Referee -- which could
@@ -495,7 +502,7 @@ A.5.  Incrementatal Adoption
    explores how to bootstrap Referee system even when the server does
    not (yet) support Referee.
 
-A.5.1.  Server Does Not Support Referee
+A.6.1.  Server Does Not Support Referee
 
    In the case a server does not support Referee, it will not register
    itself with the network's Referee.
