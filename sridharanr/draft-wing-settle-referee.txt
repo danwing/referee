@@ -4,8 +4,8 @@
 
 Network Working Group                                            D. Wing
 Internet-Draft                                                    Citrix
-Intended status: Standards Track                        26 December 2024
-Expires: 29 June 2025
+Intended status: Standards Track                        29 December 2024
+Expires: 2 July 2025
 
 
                  A Referee to Authenticate Home Servers
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 June 2025.
+   This Internet-Draft will expire on 2 July 2025.
 
 Copyright Notice
 
@@ -77,8 +77,6 @@ Table of Contents
      3.2.  Servers
      3.3.  Clients
      3.4.  Revoking Authorization
-       3.4.1.  Server Revocation
-       3.4.2.  Client Revocation
    4.  Bootstrapping the Referee
      4.1.  Clients to Referee
      4.2.  Servers to Referee
@@ -222,8 +220,6 @@ Table of Contents
 
 3.4.  Revoking Authorization
 
-3.4.1.  Server Revocation
-
    When the administrator revoke authorization for a server (e.g.,
    replacement of a printer), the administrator removes the old public
    key from the Referee and installs the new key in the Referee.
@@ -238,29 +234,6 @@ Table of Contents
 
    Thus, revoking authentication has immediate effect because the
    clients immediately validate a mismatch with the Referee.
-
-   Upon removal of a server, the Referee can send a revocation message
-   containing the server's public key to clients having active
-   connections indicating the clients to drop any active connections
-   with the server.  This message can be sent by making a TLS connection
-   with each client or using a HTTP PUT, which is implementation
-   specific.
-
-3.4.2.  Client Revocation
-
-   When the administrator revokes authorization for a client, the client
-   key is removed from the Referee and the client is required to re-
-   register with the Referee.
-
-   Upon removal of a client, the Referee can send a revocation message
-   containing the client's public key to servers having active
-   connections indicating the servers to drop any active connections
-   with the client.  This message can be sent by making a TLS connection
-   with each server or using a HTTP PUT, which is implementation
-   specific.
-
-   The re-registration of client upon revocation could be forced to be
-   done manually and is implementation specific.
 
 4.  Bootstrapping the Referee
 
@@ -385,7 +358,12 @@ A.2.  Multiple Networks: Multiple Referees
    the server could indicate the server's Referee (akin to
    [I-D.beck-tls-trust-anchor-ids]).
 
-   If there is only one referee, this problem never occurs.
+   The referees could be configured to share the list of servers and
+   associated fingerprints with each other, thereby enabling the clients
+   to communicate with any referee.  This also improves redundancy in
+   case one of the referees go down.
+
+   This section is not applicable when there is only one referee.
 
 A.3.  Unique Names
 
