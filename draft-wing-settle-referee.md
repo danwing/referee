@@ -289,7 +289,7 @@ Currently the text suggests clients should fallback to PKI if Referee
 validation fails.  This means certificate warnings for self-signed
 certificates.  Is such fallback harmful or is it worthwhile?
 
-## Multiple Networks: Multiple Referees
+## Multiple Referees on Separate Local Domains
 
 If client has multiple Referees configured (due to visiting multiple
 networks), it is anticipated the client would do service discovery to
@@ -297,6 +297,12 @@ find the network's referee and validate if the (discovered) referee is
 an already-known referee -- akin to {{?DNR=RFC9463}}.
 
 If the client only knows of one referee, this problem never occurs.
+
+## Redundant Referees on one Local Domain
+
+This draft only discusses a single Referee on each Local Domain.
+Multiple Referees may well be desirable for redundancy but are out of
+scope of this draft.
 
 ## Unique Names
 
