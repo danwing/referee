@@ -4,8 +4,8 @@
 
 Network Working Group                                            D. Wing
 Internet-Draft                                                    Citrix
-Intended status: Standards Track                        29 December 2024
-Expires: 2 July 2025
+Intended status: Standards Track                        30 December 2024
+Expires: 3 July 2025
 
 
            A Referee to Authenticate Servers in Local Domains
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 July 2025.
+   This Internet-Draft will expire on 3 July 2025.
 
 Copyright Notice
 
@@ -454,9 +454,6 @@ A.4.  Unique Names
    The Referee system allows keeping the unique name the same for the
    lifetime of the device while allowing changing its public key.
 
-   The client can uniquely identify a server by the public key of that
-   network's Referee combined with the server hostname.
-
 A.5.  Key Lifetime (Rotating Public Key)
 
    For security hygiene, the public keys in a server and in the Referee
@@ -475,7 +472,9 @@ A.5.1.  Server
       Note: such a PUT mechanism also means an attacker in possession of
       the server's private key can change the legitimate server's public
       key fingerprint in the Referee to now point at an attacker-
-      controlled system, denying access to the legitimate server.
+      controlled system, denying access to the legitimate server.  It is
+      still better than unencrypted connections, which is the case
+      today.
 
 A.5.2.  Referee
 
