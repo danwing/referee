@@ -42,11 +42,12 @@ informative:
 --- abstract
 
 Obtaining and maintaining PKI certificates for devices in a home
-network is difficult for both technical and human factors reasons. This
-document describes an alternative approach to securely identify and
-authenticate home servers using a Referee system. The referee allows
-bootstrapping a network of devices by trusting only one system in
-a local domain -- the Referee.
+network is difficult for both technical and human factors
+reasons. This document describes an alternative approach to securely
+identify and authenticate home servers using a HTTP-based trust anchor
+system, called a Referee.  The Referee allows bootstrapping a network
+of devices by trusting only the Referee trust anchor in the local
+domain.
 
 --- middle
 
@@ -55,22 +56,23 @@ a local domain -- the Referee.
 Most existing TLS communications require the server obtaining a
 certificate signed by a Certification Authority trusted by the client.
 Within a home network this is fraught with complications of both
-human factors and technical natures.
+human factors and technical natures (e.g., local domain firewall,
+lack of domain name).
 
-This document describes a Referee system to authorize the legitimate
-servers on a local domain.  A server, called a Referee, is entrusted
-to help clients identify and authenticate servers within
-the local domain.  The Referee system purposefully avoids Public Key
-Infrastructure using X.509 {{?PKIX=RFC5280}}, instead using an
-"allowlist" of public keys.
+This document describes a trust anchor system to authorize the
+legitimate servers on a local domain.  The trust anchor host, called a
+Referee, helps clients identify and authenticate previously-enrolled
+servers within the local domain.  The Referee system purposefully
+avoids Public Key Infrastructure using X.509 {{?PKIX=RFC5280}},
+instead using an "allowlist" of public keys.
 
-When clients connect to a server on the local domain and encounter
-a self-signed certificate that might otherwise cause an authentication
-failure (typically, a warning to the user), the client can query the
-local domain's pre-authorized Referee system to learn if that server
-has been enrolled with the Referee.  If so, the connection can continue --
-much as a certificate signed by a trusted Certification Authority would
-continue.
+When clients TLS connect to a server on the local domain and encounter a
+self-signed certificate that might otherwise cause an authentication
+failure (typically, a warning to the user), the client can send an
+HTTP query the local domain's pre-authorized Referee system to learn
+if that server has been enrolled with the Referee.  If so, it
+indicates the server was enrolled in the Referee trust anchor and the
+TLS connection can continue.
 
 
 # Requirements Evaluation
@@ -88,12 +90,13 @@ document has the following summarized characteristics:
 
 ## Referee
 
-The Referee function is implemented within any always-on device
-within the home (e.g., router, smart home hub, NAS).  The Referee
-contains a database of local hostnames and their Referee public
-key fingerprints.
+The Referee trust anchor function is implemented within any always-on
+device within the home (e.g., router, smart home hub, NAS).  The
+Referee contains a database of local hostnames and their Referee
+public key fingerprints.
 
-The Referee on a local network is named "referee.internal".
+The Referee on a local network is named "referee.internal", but
+that can be changed with autodiscovery (see {{discovery}}).
 
 Clients authenticate to the Referee and use HTTP GET to fetch the
 named public key fingerprint from the Referee server.  For example to
@@ -128,16 +131,19 @@ functionality might be automated; see {{key-lifetime}}.
 ## Clients
 
 A client supporting this specification is first configured with the
-DNS name of its Referee server, which MAY occur via service discovery.
-The client authenticates and authorizes the Referee server using one
-of the bootstrapping mechanisms (see {{bootstrapping}}). This step
-occurs only once for each home network the client joins, as each home
-network is responsible for being a Referee for its own local domain.
+DNS name of its Referee server, which MAY occur via service discovery
+(see {{discovery}}).  The client authenticates and authorizes the
+Referee server using one of the bootstrapping mechanisms (see
+{{bootstrapping}}). This step occurs only once for each home network
+the client joins, as each home network is responsible for being a
+Referee for its own local domain.
 
-On a connection to a server on the local domain (see {{local}}) there
-are two situations that may occur: the client has not previously cached the
-association of hostname to public key or it has cached that
-information.
+On a connection to a server on the local domain (see {{local}}) the
+client includes the server's local domain name in the TLS Server Name
+Indication (SNI) extension of its ClientHello.  On receiving the
+server's certificate in the TLS exchange, one of two situations will
+occur: the client has not previously cached the association of that
+hostname to that public key or it has cached that information.
 
 * If not previously cached, the client queries that network's Referee
 with the DNS name of the server (e.g., printer.internal).  The Referee
@@ -158,7 +164,7 @@ the Referee, the client verifies it matches the public key from the
 TLS handshake.  If they match, the client replaces the information in
 its cache.
 
-Internally a client might form a unique identity for a local domain
+Internally, a client might form a unique identity for a local domain
 server as hostname (e.g., printer.local) combined with the identity
 of the Referee, such as the Referee's public key fingerprint.  In this
 way, when the client is on a different network (which will have a
@@ -166,6 +172,7 @@ different Referee), a server name collision (e.g., local.printer) will
 result in a unique internal identity for that server -- keeping all
 the server-specific data separate (e.g., web forms, passwords, local
 storage, etc.).
+
 
 ## Revoking Authorization
 
@@ -188,16 +195,13 @@ immediately validate a mismatch with the Referee.
 ## Clients to Referee
 
 The clients have to be configured to trust their Referee. This is
-a one time activity, for each home network the client joins.
+a one time activity, for each home network the client joins.  This
+can be somewhat automated using service discovery ({{discovery}}).
 
 Until service discovery is defined for a Referee system, the client
 has to be configured to trust the Referee server's public key
 fingerprint.  This can be done manually or using TOFU, and is
 implementation specific.
-
-> for discussion: To reduce initial bootstrap for client, perhaps use
-  service discovery for client to bootstrap its Referee, akin to
-  {{?DNR=RFC9463}}?
 
 > for discussion: see {{key-lifetime}} regarding Referee key lifetime.
 
@@ -246,6 +250,48 @@ connection is made to that address, those are also considered
 * 169.254/16 and fe80::/10 (from {{?RFC3927}} and {{?RFC4291}})
 * fc00::/7 (from {{?RFC4193}})
 * 127/8 and ::1/128 (from {{Section 3.2.1.3 of ?RFC1122}} and {{?RFC4291}})
+
+
+# Service Discovery {#discovery}
+
+TODO: needs more detail and discussion.
+
+To ease initial bootstrapping the client, the local domain can
+advertise its Referee server using a SRV resource record of
+"referee._http._tcp.local" using {{?DNS-SD=RFC6763}}.  The client
+connects to that server using HTTPS and extracts the public key.  That
+public key has either not been seen before or has been seen before:
+
+* If the public key has not been seen before, the user needs to
+  approve use of that Referee trust anchor for this local domain; the
+  exact method is out of scope of this document.
+
+* If the public key has been seen before, and was previously approved
+  (or previously rejected) by the user, that same user decision is
+  applied again.
+
+
+> Discussion: the above design prevents the Referee from changing its
+  public key, even though the Referee trust anchor allows other
+  servers on the local domain (e.g., printers, file shares) to change
+  their public key.
+
+> Discussion: To allow the Referee to change its public key, we could
+  rely on traditional PKIX-based authentication where Referee's
+  certificate is signed by a Certification Authority the client
+  already trusts.  With that, the client could bootstrap to that
+  Referee using just its name, similar to {{?DNR=RFC9463}}.  However,
+  this requires local domains have a domain name for their Referee and
+  requires the Referee be able to obtain (and renew) its CA-signed
+  certificate.  A domain name might be managed by the vendor of the
+  Referee, their ISP, or a managed service provider (MSP).  Obtaining
+  a CA-signed certificate is at least reduced to being solved with
+  just one device on the local domain (the Referee) rather than each
+  of the servers on the local network.
+
+> Discussion: DHCP and RA could be specified instead of (or in
+  addition to) DNS-SD.
+
 
 
 # Operational Notes {#operational-notes}
