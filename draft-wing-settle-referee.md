@@ -189,6 +189,7 @@ immediately validate a mismatch with the Referee.
 The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.
 
+
 Until service discovery is defined for a Referee system, the client
 has to be configured to trust the Referee server's public key
 fingerprint.  This can be done manually or using TOFU, and is
@@ -337,9 +338,6 @@ legitimacy.
 The Referee system allows keeping the unique name the same for the
 lifetime of the device while allowing changing its public key.
 
-The client can uniquely identify a server by the public key of
-that network's Referee combined with the server hostname.
-
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
 
 For security hygiene, the public keys in a server and in the Referee
@@ -357,7 +355,8 @@ JSON Web Signature) and publish its new public key using an HTTP PUT.
 > Note: such a PUT mechanism also means an attacker in possession of
 the server's private key can change the legitimate server's public key
 fingerprint in the Referee to now point at an attacker-controlled
-system, denying access to the legitimate server.
+system, denying access to the legitimate server. It is still better than
+unencrypted connections, which is the case today.
 
 
 ### Referee
