@@ -128,10 +128,11 @@ functionality might be automated; see {{key-lifetime}}.
 ## Clients
 
 A client supporting this specification is first configured with the
-DNS name of its Referee server.  It authenticates to the Referee server
-using one of the bootstrapping mechanisms (see {{bootstrapping}}). This
-step occurs only once for each home network the client joins, as each
-home network is responsible for being a Referee for its own devices.
+DNS name of its Referee server, which MAY occur via service discovery.
+The client authenticates and authorizes the Referee server using one
+of the bootstrapping mechanisms (see {{bootstrapping}}). This step
+occurs only once for each home network the client joins, as each home
+network is responsible for being a Referee for its own local domain.
 
 On a connection to a server on the local domain (see {{local}}) there
 are two situations that may occur: the client has not previously cached the
@@ -189,25 +190,21 @@ immediately validate a mismatch with the Referee.
 The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.
 
-
 Until service discovery is defined for a Referee system, the client
 has to be configured to trust the Referee server's public key
 fingerprint.  This can be done manually or using TOFU, and is
 implementation specific.
 
-> for discussion: To reduce initial bootstrap for client, perhaps use SVCB for
-  client to bootstrap its first Referee?  This effectively achieves
-  un-authenticated encryption to devices on the local network which is
-  better than unencrypted traffic to those same devices.  For an
-  attacker to abuse this, it requires an attacker advertise itself
-  as the Referee and to maintain its status as Referee.
+> for discussion: To reduce initial bootstrap for client, perhaps use
+  service discovery for client to bootstrap its Referee, akin to
+  {{?DNR=RFC9463}}?
 
 > for discussion: see {{key-lifetime}} regarding Referee key lifetime.
 
 ## Servers to Referee
 
 Server names and their associated public key fingerprints have to
-be populated into the Referee.
+be enrolled with the Referee.
 
 ### Short Code or Scan Code
 
@@ -276,7 +273,9 @@ is unavailable.
 
 # IANA Considerations
 
-Register new .well_known URI for "referee".
+Register new .well_known URI for "referee" server.
+
+TODO: service discovery to find Referee's DNS name.
 
 --- back
 
@@ -290,16 +289,14 @@ Currently the text suggests clients should fallback to PKI if Referee
 validation fails.  This means certificate warnings for self-signed
 certificates.  Is such fallback harmful or is it worthwhile?
 
-## Multiple Referees on Separate Local Domains
+## Distinct Local Domain with its Own Referee
 
-If client has multiple Referees configured (due to visiting multiple
-networks), it is anticipated the client would do service discovery to
-find the network's referee and validate if the (discovered) referee is
-an already-known referee -- akin to {{?DNR=RFC9463}}.
+Each local domain is anticipated to have its own Referee.  Thus, when
+a client visits another network, that network will have its own
+Referee which is learned via service discovery.  That Referee is
+bootstrapped same as the 'home' network's Referee (see {{bootstrapping}}).
 
-If the client only knows of one referee, this problem never occurs.
-
-## Redundant Referees on one Local Domain
+## Redundant Referees on One Local Domain
 
 This draft only discusses a single Referee on each Local Domain.
 Multiple Referees may well be desirable for redundancy but are out of
