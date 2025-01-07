@@ -14,7 +14,11 @@ v: 3
 keyword:
  - local domain
  - tls
- - tofu
+ - certificate
+ - allow-list
+ - allow list
+ - whitelist
+
 
 venue:
   group: SETTLE
@@ -22,7 +26,7 @@ venue:
   mail: settle@ietf.org
   arch: https://mailarchive.ietf.org/arch/browse/settle/
   github: "danwing/referee"
-  latest: "https://danwing.github.io/referee/draft-xyzzy-referee.html"
+  latest: "https://danwing.github.io/referee/draft-wing-settle-referee.html"
 
 author:
  -
@@ -64,7 +68,7 @@ legitimate servers on the local domain.  The trust anchor host, called a
 Referee, helps clients identify and authenticate previously-enrolled
 servers within the local domain.  The Referee system purposefully
 avoids Public Key Infrastructure using X.509 {{?PKIX=RFC5280}},
-instead using an "allowlist" of public keys.
+instead using an "allow list" of public keys.
 
 When clients TLS connect to a server on the local domain and encounter a
 self-signed certificate that might otherwise cause an authentication
@@ -100,7 +104,7 @@ differ from other trust anchor systems:
   server does not change its public key, and
 
 * Servers that participate in the Referee system can change their
-  public keys periodicially and inform the Referee, which allows
+  public keys periodically and inform the Referee, which allows
   clients to automatically handle those public key changes.
 
 
@@ -124,9 +128,6 @@ device within the local domain (e.g., router, smart home hub, NAS, or
 a virtualized CPE).  The Referee runs HTTPS and serves files
 containing public key fingerprints indexed by each server's local
 domain name.
-
-The Referee on a local network is named "referee.internal", but
-that can be changed with autodiscovery (see {{discovery}}).
 
 Clients authenticate to the Referee and use HTTP GET to fetch the
 named public key fingerprint from the Referee server.  For example to
@@ -156,11 +157,12 @@ device to a Referee network, the device's hostname and public key
 fingerprint are stored into the Referee Server.  Several options
 exist for this step, detailed in {{bootstrapping}}.
 
-If a server's Referee public key changes (e.g., factory reset,
-public key algorithm, key length) the new key needs
-to be enrolled with the Referee and the old key removed. Clients
-will notice the mismatch and will query the Referee.  This
-functionality might be automated; see {{key-lifetime}}.
+If a server's public key changes (e.g., factory reset, public key
+algorithm, key length) the new key needs to be enrolled with the
+Referee and the old key removed (see {{key-lifetime}}). Clients will
+notice the mismatch and will query the Referee, which provides the
+new key's fingerprint, authenticating the server (with its new
+key) to the client.
 
 ## Clients
 
@@ -210,17 +212,16 @@ the Referee, such as the Referee's public key fingerprint (if not
 signed by a global Certification Authority) or the Referee's name (if
 signed by a global Certification Authority).  In this way, when the
 client is on a different network (which will have a different
-Referee), a server name collision (e.g., local.printer) will result in
+Referee), a server name collision (e.g., router.local) will result in
 a unique internal identity for that server -- keeping all the
 server-specific data separate for those two servers on different
-networks (e.g., web forms, passwords, local
-storage, etc.)
+networks (e.g., web forms, passwords, local storage, etc.)
 
 
 ## Revoking Authorization
 
 When the administrator revokes authorization for a server (e.g., replacement
-of a printer), the administrator removes the old public key from the Referee
+of a server), the administrator removes the old public key from the Referee
 and installs the new key in the Referee.
 
 When this replacement occurs, the clients that have not already cached
@@ -298,11 +299,11 @@ connection is made to that address, those are also considered
 # Service Discovery {#discovery}
 
 To ease initial bootstrapping the client, the local domain can
-advertise its Referee server using a new DHCP option.  The client
-connects to that server using HTTPS and extracts the public key.  Each
-local domain has its own Referee which only has purview over servers
-in its same local domain.  The Refereee's public key has either not
-been seen before or has been seen before:
+advertise its Referee server using a new DHCP option (see {{iana}}).
+The client connects to that server using HTTPS and extracts the public
+key.  Each local domain has its own Referee which only has purview
+over servers in its same local domain.  The Referee's public key has
+either not been seen before or has been seen before:
 
 * If the public key has not been seen before, the user needs to
   approve use of that Referee trust anchor for this local domain; the
@@ -311,25 +312,6 @@ been seen before or has been seen before:
 * If the public key has been seen before, and was previously approved
   (or previously rejected) by the user, that same user decision is
   applied again.
-
-
-> Discussion: the above design prevents the Referee from changing its
-  public key, even though the Referee trust anchor allows other
-  servers on the local domain (e.g., printers, file shares) to change
-  their public key.
-
-> Discussion: To allow the Referee to change its public key, we could
-  rely on traditional PKIX-based authentication where Referee's
-  certificate is signed by a Certification Authority the client
-  already trusts.  With that, the client could bootstrap to that
-  Referee using just its name, similar to {{?DNR=RFC9463}}.  However,
-  this requires local domains have a domain name for their Referee and
-  requires the Referee be able to obtain (and renew) its CA-signed
-  certificate.  A domain name might be managed by the vendor of the
-  Referee, their ISP, or a managed service provider (MSP).  Obtaining
-  a CA-signed certificate is at least reduced to being solved with
-  just one device on the local domain (the Referee) rather than each
-  of the servers on the local network.
 
 
 # Deploying without Server Support
@@ -342,7 +324,7 @@ servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
 POP3S).  After finding a server, the Referee can prompt the user for
 confirmation to add the server to the Referee allow-list.
 
-To accommodate servers that rotate their public key but do not (yet)
+To accommodate servers that change their public key but do not (yet)
 register that change with the Referee, the Referee can refresh its
 server fingerprints at user request.
 
@@ -367,7 +349,7 @@ See {{operational}} describing client behavior when the Referee
 is unavailable.
 
 
-# IANA Considerations
+# IANA Considerations {#iana}
 
 Register new .well_known URI for Referee server.
 
@@ -416,7 +398,7 @@ example:
   router.fb5f73ed-275a-431e-aecf-436f0c54d69d.internal
 ~~~~~
 
-The Referee system is ambilvalnt about the name -- the Referee's name
+The Referee system is ambivalent about the name -- the Referee's name
 and each server's name need only be unique on the current local
 domain. Name collisions that occur between local domains are handled
 by the client querying the other network's trusted Referee to check
@@ -429,12 +411,13 @@ legitimacy.
 ~~~~~
 
 The Referee system allows keeping the unique name the same for the
-lifetime of the device while allowing changing its public key.
+lifetime of the device while allowing changing its public key, if
+the server informs the Referee about its public key change.
 
 ## Key Lifetime (Rotating Public Key) {#key-lifetime}
 
-For security hygiene, the public keys in a server and in the Referee
-are occasionally changed. This section discusses how such changes are
+For security hygiene, the public keys in a server and the Referee may
+be occasionally changed. This section discusses how such changes are
 handled by a Referee system.
 
 ### Server
@@ -452,7 +435,7 @@ system, denying access to the legitimate server. It is still better than
 unencrypted connections, which is the case today.
 
 
-### Referee
+### Referee {#referee-public-key-change}
 
 If the Referee's public key changes all the clients have to
 re-authenticate the Referee's new public key.  This is uncool.
