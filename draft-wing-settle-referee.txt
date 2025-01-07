@@ -26,8 +26,8 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://danwing.github.io/referee/draft-xyzzy-referee.html.  Status
-   information for this document may be found at
+   https://danwing.github.io/referee/draft-wing-settle-referee.html.
+   Status information for this document may be found at
    https://datatracker.ietf.org/doc/draft-wing-settle-referee/.
 
    Discussion of this document takes place on the SETTLE mailing list
@@ -83,16 +83,15 @@ Table of Contents
      5.1.  Clients to Referee
      5.2.  Servers to Referee
        5.2.1.  Short Code or Scan Code
-       5.2.2.  TOFU
+       5.2.2.  Manual Configuration
    6.  Identifying Servers as Local
      6.1.  Local Domain Names
      6.2.  Local IP Addresses
    7.  Service Discovery
-   8.  Deploying without Server Support
-   9.  Operational Considerations
-   10. Security Considerations
-   11. IANA Considerations
-   12. Informative References
+   8.  Operational Considerations
+   9.  Security Considerations
+   10. IANA Considerations
+   11. Informative References
    Appendix A.  Issues for Further Discussion
      A.1.  PKI Fallback
      A.2.  Distinct Local Domain with its Own Referee
@@ -119,7 +118,7 @@ Table of Contents
    called a Referee, helps clients identify and authenticate previously-
    enrolled servers within the local domain.  The Referee system
    purposefully avoids Public Key Infrastructure using X.509 [PKIX],
-   instead using an "allowlist" of public keys.
+   instead using an "allow list" of public keys.
 
    When clients TLS connect to a server on the local domain and
    encounter a self-signed certificate that might otherwise cause an
@@ -156,7 +155,7 @@ Table of Contents
       provided server does not change its public key, and
 
    *  Servers that participate in the Referee system can change their
-      public keys periodicially and inform the Referee, which allows
+      public keys periodically and inform the Referee, which allows
       clients to automatically handle those public key changes.
 
 3.  Requirements Evaluation
@@ -184,9 +183,6 @@ Table of Contents
    containing public key fingerprints indexed by each server's local
    domain name.
 
-   The Referee on a local network is named "referee.internal", but that
-   can be changed with autodiscovery (see Section 7).
-
    Clients authenticate to the Referee and use HTTP GET to fetch the
    named public key fingerprint from the Referee server.  For example to
    get public key fingerprint of a server named printer-
@@ -212,11 +208,12 @@ Table of Contents
    key fingerprint are stored into the Referee Server.  Several options
    exist for this step, detailed in Section 5.
 
-   If a server's Referee public key changes (e.g., factory reset, public
-   key algorithm, key length) the new key needs to be enrolled with the
-   Referee and the old key removed.  Clients will notice the mismatch
-   and will query the Referee.  This functionality might be automated;
-   see Appendix A.5.
+   If a server's public key changes (e.g., factory reset, public key
+   algorithm, key length) the new key needs to be enrolled with the
+   Referee and the old key removed (see Appendix A.5).  Clients will
+   notice the mismatch and will query the Referee, which provides the
+   new key's fingerprint, authenticating the server (with its new key)
+   to the client.
 
 4.3.  Clients
 
@@ -267,15 +264,15 @@ Table of Contents
    signed by a global Certification Authority) or the Referee's name (if
    signed by a global Certification Authority).  In this way, when the
    client is on a different network (which will have a different
-   Referee), a server name collision (e.g., local.printer) will result
-   in a unique internal identity for that server -- keeping all the
-   server-specific data separate for those two servers on different
-   networks (e.g., web forms, passwords, local storage, etc.)
+   Referee), a server name collision (e.g., router.local) will result in
+   a unique internal identity for that server -- keeping all the server-
+   specific data separate for those two servers on different networks
+   (e.g., web forms, passwords, local storage, etc.)
 
 4.4.  Revoking Authorization
 
    When the administrator revokes authorization for a server (e.g.,
-   replacement of a printer), the administrator removes the old public
+   replacement of a server), the administrator removes the old public
    key from the Referee and installs the new key in the Referee.
 
    When this replacement occurs, the clients that have not already
@@ -297,31 +294,41 @@ Table of Contents
    one time activity, for each home network the client joins.  This can
    be somewhat automated using service discovery (Section 7).
 
-   Until service discovery is defined for a Referee system, the client
-   has to be configured to trust the Referee server's public key
-   fingerprint.  This can be done manually or using TOFU, and is
-   implementation specific.
-
-      for discussion: see Appendix A.5 regarding Referee key lifetime.
+   The client is configured to trust the Referee server's public key.
+   If this key changes, session resumption might be useful to avoid
+   having the client re-configured to trust that new public key, see
+   Appendix A.5.2.
 
 5.2.  Servers to Referee
 
    Server names and their associated public key fingerprints have to be
-   enrolled with the Referee.
+   enrolled with the Referee.  This can be automated by servers that
+   support Referee, or can be done manually for servers that do not
+   (yet) support Referee -- providing immediate value to Referee clients
+   without waiting for server Referee support.
 
 5.2.1.  Short Code or Scan Code
 
    Short code printed on the Referee-capable server which can be scanned
    by a smartphone application by the home administrator which is
-   authorized to push new associations to the Referee.  Alternatively,
-   the same information could be manually typed in by the home
-   administrator to the Referee's management GUI or CLI.
+   authorized to push new associations to the Referee.
 
-5.2.2.  TOFU
+5.2.2.  Manual Configuration
 
-   A client device which leans the Referee does not have an existing
-   entry for a (new) name is authorized to 'push' the (new) name and its
-   public key fingerprint to the Referee.
+   It is useful for a Referee server to provide immediate value on its
+   installation, even when servers do not (yet) support Referee.
+
+   To do so, the Referee has a user interface for manual addition of a
+   server.
+
+   The Referee might also scan the local domain network looking for TLS
+   servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
+   POP3S).  After finding a server, the Referee can prompt the user for
+   confirmation to add the server to the Referee allow-list.
+
+   To accommodate servers that change their public key but do not (yet)
+   register that change with the Referee, the Referee can refresh its
+   server fingerprints at user request.
 
 6.  Identifying Servers as Local
 
@@ -358,11 +365,12 @@ Table of Contents
 7.  Service Discovery
 
    To ease initial bootstrapping the client, the local domain can
-   advertise its Referee server using a new DHCP option.  The client
-   connects to that server using HTTPS and extracts the public key.
-   Each local domain has its own Referee which only has purview over
-   servers in its same local domain.  The Refereee's public key has
-   either not been seen before or has been seen before:
+   advertise its Referee server using a new DHCP option (see
+   Section 10).  The client connects to that server using HTTPS and
+   extracts the public key.  Each local domain has its own Referee which
+   only has purview over servers in its same local domain.  The
+   Referee's public key has either not been seen before or has been seen
+   before:
 
    *  If the public key has not been seen before, the user needs to
       approve use of that Referee trust anchor for this local domain;
@@ -372,39 +380,7 @@ Table of Contents
       approved (or previously rejected) by the user, that same user
       decision is applied again.
 
-      Discussion: the above design prevents the Referee from changing
-      its public key, even though the Referee trust anchor allows other
-      servers on the local domain (e.g., printers, file shares) to
-      change their public key.
-
-      Discussion: To allow the Referee to change its public key, we
-      could rely on traditional PKIX-based authentication where
-      Referee's certificate is signed by a Certification Authority the
-      client already trusts.  With that, the client could bootstrap to
-      that Referee using just its name, similar to [DNR].  However, this
-      requires local domains have a domain name for their Referee and
-      requires the Referee be able to obtain (and renew) its CA-signed
-      certificate.  A domain name might be managed by the vendor of the
-      Referee, their ISP, or a managed service provider (MSP).
-      Obtaining a CA-signed certificate is at least reduced to being
-      solved with just one device on the local domain (the Referee)
-      rather than each of the servers on the local network.
-
-8.  Deploying without Server Support
-
-   It is useful for a Referee server to provide immediate value on its
-   installation, even when servers do not (yet) support Referee.  To do
-   so, the Referee has a user interface for manual addition of a server.
-   The Referee might also scan the local domain network looking for TLS
-   servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
-   POP3S).  After finding a server, the Referee can prompt the user for
-   confirmation to add the server to the Referee allow-list.
-
-   To accommodate servers that rotate their public key but do not (yet)
-   register that change with the Referee, the Referee can refresh its
-   server fingerprints at user request.
-
-9.  Operational Considerations
+8.  Operational Considerations
 
    The Referee has to always be available.  The client cache helps
    reduce load on the Referee but new clients (e.g., new devices, guest
@@ -416,26 +392,20 @@ Table of Contents
    by a Certification Authority already trusted by the clients, or else
    clients will need to manually trust individual certificates.
 
-10.  Security Considerations
+9.  Security Considerations
 
    TODO: expand security considerations.
 
-   See Section 9 describing client behavior when the Referee is
+   See Section 8 describing client behavior when the Referee is
    unavailable.
 
-11.  IANA Considerations
+10.  IANA Considerations
 
    Register new .well_known URI for Referee server.
 
    Register new DHCP option for Referee server.
 
-12.  Informative References
-
-   [DNR]      Boucadair, M., Ed., Reddy.K, T., Ed., Wing, D., Cook, N.,
-              and T. Jensen, "DHCP and Router Advertisement Options for
-              the Discovery of Network-designated Resolvers (DNR)",
-              RFC 9463, DOI 10.17487/RFC9463, November 2023,
-              <https://www.rfc-editor.org/rfc/rfc9463>.
+11.  Informative References
 
    [Homenet]  Pfister, P. and T. Lemon, "Special-Use Domain
               'home.arpa.'", RFC 8375, DOI 10.17487/RFC8375, May 2018,
@@ -534,7 +504,7 @@ A.4.  Unique Names
      nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
      router.fb5f73ed-275a-431e-aecf-436f0c54d69d.internal
 
-   The Referee system is ambilvalnt about the name -- the Referee's name
+   The Referee system is ambivalent about the name -- the Referee's name
    and each server's name need only be unique on the current local
    domain.  Name collisions that occur between local domains are handled
    by the client querying the other network's trusted Referee to check
@@ -545,13 +515,14 @@ A.4.  Unique Names
      router.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
 
    The Referee system allows keeping the unique name the same for the
-   lifetime of the device while allowing changing its public key.
+   lifetime of the device while allowing changing its public key, if the
+   server informs the Referee about its public key change.
 
 A.5.  Key Lifetime (Rotating Public Key)
 
-   For security hygiene, the public keys in a server and in the Referee
-   are occasionally changed.  This section discusses how such changes
-   are handled by a Referee system.
+   For security hygiene, the public keys in a server and the Referee may
+   be occasionally changed.  This section discusses how such changes are
+   handled by a Referee system.
 
 A.5.1.  Server
 
@@ -574,17 +545,18 @@ A.5.2.  Referee
    If the Referee's public key changes all the clients have to re-
    authenticate the Referee's new public key.  This is uncool.
 
-   To allow changing the Referee's public key without client re-
-   authentication, the client and Referee could do session resumption
-   for its subsequent connections to the Referee (Section 2.2 of
-   [RFC8446]).  When doing session resumption with the Referee, the
-   client should also retrieve and cache the Referee's current public
-   key fingerprint so if, in the future, the Referee cannot perform
-   session resumption the client can still authenticate the Referee.
+   To allow changing the Referee's public key without needing the client
+   to re-authenticate the Referee, the client and Referee could do
+   session resumption for its subsequent connections to the Referee
+   (Section 2.2 of [RFC8446]).  If session resumption succeeds, the
+   client can query a the Referee's own well-known URI to determine if
+   the Referee's public key has changed, and update itself accordingly.
 
    With the above technique, the client will only have to (manually) re-
    authenticate the Referee when the Referee cannot perform session
-   resumption.
+   resumption.  As session resumption is usually implemented using the
+   server's private key, the Referee would need to remember its previous
+   private key (or two or three).
 
 A.6.  Incrementatal Adoption
 

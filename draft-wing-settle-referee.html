@@ -18,7 +18,10 @@ anchor in the local domain.
 <meta content="xml2rfc 3.25.0" name="generator">
 <meta content="local domain" name="keyword">
 <meta content="tls" name="keyword">
-<meta content="tofu" name="keyword">
+<meta content="certificate" name="keyword">
+<meta content="allow-list" name="keyword">
+<meta content="allow list" name="keyword">
+<meta content="whitelist" name="keyword">
 <meta content="draft-wing-settle-referee-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.25.0
@@ -1101,7 +1104,7 @@ anchor in the local domain.<a href="#section-abstract-1" class="pilcrow">¶</a><
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        The latest revision of this draft can be found at <span><a href="https://danwing.github.io/referee/draft-xyzzy-referee.html">https://danwing.github.io/referee/draft-xyzzy-referee.html</a></span>.
+        The latest revision of this draft can be found at <span><a href="https://danwing.github.io/referee/draft-wing-settle-referee.html">https://danwing.github.io/referee/draft-wing-settle-referee.html</a></span>.
         Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-wing-settle-referee/">https://datatracker.ietf.org/doc/draft-wing-settle-referee/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
@@ -1198,7 +1201,7 @@ anchor in the local domain.<a href="#section-abstract-1" class="pilcrow">¶</a><
                     <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-short-code-or-scan-code" class="internal xref">Short Code or Scan Code</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
-                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-tofu" class="internal xref">TOFU</a></p>
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-manual-configuration" class="internal xref">Manual Configuration</a></p>
 </li>
                 </ul>
 </li>
@@ -1219,61 +1222,58 @@ anchor in the local domain.<a href="#section-abstract-1" class="pilcrow">¶</a><
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-service-discovery" class="internal xref">Service Discovery</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-deploying-without-server-su" class="internal xref">Deploying without Server Support</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-operational-considerations" class="internal xref">Operational Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-operational-considerations" class="internal xref">Operational Considerations</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-informative-references" class="internal xref">Informative References</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-informative-references" class="internal xref">Informative References</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-issues-for-further-discussi" class="internal xref">Issues for Further Discussion</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-issues-for-further-discussi" class="internal xref">Issues for Further Discussion</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
-                <p id="section-toc.1-1.13.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-pki-fallback" class="internal xref">PKI Fallback</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-pki-fallback" class="internal xref">PKI Fallback</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
-                <p id="section-toc.1-1.13.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-distinct-local-domain-with-" class="internal xref">Distinct Local Domain with its Own Referee</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-distinct-local-domain-with-" class="internal xref">Distinct Local Domain with its Own Referee</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.3">
-                <p id="section-toc.1-1.13.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-redundant-referees-on-one-l" class="internal xref">Redundant Referees on One Local Domain</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
+                <p id="section-toc.1-1.12.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-redundant-referees-on-one-l" class="internal xref">Redundant Referees on One Local Domain</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.4">
-                <p id="section-toc.1-1.13.2.4.1"><a href="#appendix-A.4" class="auto internal xref">A.4</a>.  <a href="#name-unique-names" class="internal xref">Unique Names</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.4">
+                <p id="section-toc.1-1.12.2.4.1"><a href="#appendix-A.4" class="auto internal xref">A.4</a>.  <a href="#name-unique-names" class="internal xref">Unique Names</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.5">
-                <p id="section-toc.1-1.13.2.5.1"><a href="#appendix-A.5" class="auto internal xref">A.5</a>.  <a href="#name-key-lifetime-rotating-publi" class="internal xref">Key Lifetime (Rotating Public Key)</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5">
+                <p id="section-toc.1-1.12.2.5.1"><a href="#appendix-A.5" class="auto internal xref">A.5</a>.  <a href="#name-key-lifetime-rotating-publi" class="internal xref">Key Lifetime (Rotating Public Key)</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.5.2.1">
-                    <p id="section-toc.1-1.13.2.5.2.1.1"><a href="#appendix-A.5.1" class="auto internal xref">A.5.1</a>.  <a href="#name-server" class="internal xref">Server</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5.2.1">
+                    <p id="section-toc.1-1.12.2.5.2.1.1"><a href="#appendix-A.5.1" class="auto internal xref">A.5.1</a>.  <a href="#name-server" class="internal xref">Server</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.5.2.2">
-                    <p id="section-toc.1-1.13.2.5.2.2.1"><a href="#appendix-A.5.2" class="auto internal xref">A.5.2</a>.  <a href="#name-referee-2" class="internal xref">Referee</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5.2.2">
+                    <p id="section-toc.1-1.12.2.5.2.2.1"><a href="#appendix-A.5.2" class="auto internal xref">A.5.2</a>.  <a href="#name-referee-2" class="internal xref">Referee</a></p>
 </li>
                 </ul>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.6">
-                <p id="section-toc.1-1.13.2.6.1"><a href="#appendix-A.6" class="auto internal xref">A.6</a>.  <a href="#name-incrementatal-adoption" class="internal xref">Incrementatal Adoption</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.6">
+                <p id="section-toc.1-1.12.2.6.1"><a href="#appendix-A.6" class="auto internal xref">A.6</a>.  <a href="#name-incrementatal-adoption" class="internal xref">Incrementatal Adoption</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.6.2.1">
-                    <p id="section-toc.1-1.13.2.6.2.1.1"><a href="#appendix-A.6.1" class="auto internal xref">A.6.1</a>.  <a href="#name-server-does-not-support-ref" class="internal xref">Server Does Not Support Referee</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.6.2.1">
+                    <p id="section-toc.1-1.12.2.6.2.1.1"><a href="#appendix-A.6.1" class="auto internal xref">A.6.1</a>.  <a href="#name-server-does-not-support-ref" class="internal xref">Server Does Not Support Referee</a></p>
 </li>
                 </ul>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1294,7 +1294,7 @@ legitimate servers on the local domain.  The trust anchor host, called a
 Referee, helps clients identify and authenticate previously-enrolled
 servers within the local domain.  The Referee system purposefully
 avoids Public Key Infrastructure using X.509 <span>[<a href="#PKIX" class="cite xref">PKIX</a>]</span>,
-instead using an "allowlist" of public keys.<a href="#section-1-2" class="pilcrow">¶</a></p>
+instead using an "allow list" of public keys.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">When clients TLS connect to a server on the local domain and encounter a
 self-signed certificate that might otherwise cause an authentication
 failure (typically, a warning to the user), the client can send an
@@ -1340,7 +1340,7 @@ server does not change its public key, and<a href="#section-2-2.6.1" class="pilc
 </li>
         <li class="normal" id="section-2-2.7">
           <p id="section-2-2.7.1">Servers that participate in the Referee system can change their
-public keys periodicially and inform the Referee, which allows
+public keys periodically and inform the Referee, which allows
 clients to automatically handle those public key changes.<a href="#section-2-2.7.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
@@ -1398,21 +1398,19 @@ device within the local domain (e.g., router, smart home hub, NAS, or
 a virtualized CPE).  The Referee runs HTTPS and serves files
 containing public key fingerprints indexed by each server's local
 domain name.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1-2">The Referee on a local network is named "referee.internal", but
-that can be changed with autodiscovery (see <a href="#discovery" class="auto internal xref">Section 7</a>).<a href="#section-4.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1-3">Clients authenticate to the Referee and use HTTP GET to fetch the
+<p id="section-4.1-2">Clients authenticate to the Referee and use HTTP GET to fetch the
 named public key fingerprint from the Referee server.  For example to
 get public key fingerprint of a server named
 printer-abcdef123.internal and a server named router.local, the
-following two GETs would be issued:<a href="#section-4.1-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.1-4">
+following two GETs would be issued:<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.1-3">
 <pre>
   GET /.well-known/referee/sha256/printer-abcdef123.internal HTTP/1.1
   GET /.well-known/referee/sha256/printer.internal HTTP/1.1
-</pre><a href="#section-4.1-4" class="pilcrow">¶</a>
+</pre><a href="#section-4.1-3" class="pilcrow">¶</a>
 </div>
-<p id="section-4.1-5">The data returned is the SHA-256 fingerprint of the server's public
-key returned as an octet-stream.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">The data returned is the SHA-256 fingerprint of the server's public
+key returned as an octet-stream.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="servers">
@@ -1429,11 +1427,12 @@ persists for the lifetime of the device.  During installation of the
 device to a Referee network, the device's hostname and public key
 fingerprint are stored into the Referee Server.  Several options
 exist for this step, detailed in <a href="#bootstrapping" class="auto internal xref">Section 5</a>.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3">If a server's Referee public key changes (e.g., factory reset,
-public key algorithm, key length) the new key needs
-to be enrolled with the Referee and the old key removed. Clients
-will notice the mismatch and will query the Referee.  This
-functionality might be automated; see <a href="#key-lifetime" class="auto internal xref">Appendix A.5</a>.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">If a server's public key changes (e.g., factory reset, public key
+algorithm, key length) the new key needs to be enrolled with the
+Referee and the old key removed (see <a href="#key-lifetime" class="auto internal xref">Appendix A.5</a>). Clients will
+notice the mismatch and will query the Referee, which provides the
+new key's fingerprint, authenticating the server (with its new
+key) to the client.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="clients">
@@ -1488,11 +1487,10 @@ the Referee, such as the Referee's public key fingerprint (if not
 signed by a global Certification Authority) or the Referee's name (if
 signed by a global Certification Authority).  In this way, when the
 client is on a different network (which will have a different
-Referee), a server name collision (e.g., local.printer) will result in
+Referee), a server name collision (e.g., router.local) will result in
 a unique internal identity for that server -- keeping all the
 server-specific data separate for those two servers on different
-networks (e.g., web forms, passwords, local
-storage, etc.)<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+networks (e.g., web forms, passwords, local storage, etc.)<a href="#section-4.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revoking-authorization">
@@ -1501,7 +1499,7 @@ storage, etc.)<a href="#section-4.3-5" class="pilcrow">¶</a></p>
 <a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-revoking-authorization" class="section-name selfRef">Revoking Authorization</a>
         </h3>
 <p id="section-4.4-1">When the administrator revokes authorization for a server (e.g., replacement
-of a printer), the administrator removes the old public key from the Referee
+of a server), the administrator removes the old public key from the Referee
 and installs the new key in the Referee.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
 <p id="section-4.4-2">When this replacement occurs, the clients that have not already cached
 the server's public key will simply query the Referee, which has the server's
@@ -1528,15 +1526,10 @@ immediately validate a mismatch with the Referee.<a href="#section-4.4-3" class=
 <p id="section-5.1-1">The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.  This
 can be somewhat automated using service discovery (<a href="#discovery" class="auto internal xref">Section 7</a>).<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">Until service discovery is defined for a Referee system, the client
-has to be configured to trust the Referee server's public key
-fingerprint.  This can be done manually or using TOFU, and is
-implementation specific.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-5.1-3.1">
-            <p id="section-5.1-3.1.1">for discussion: see <a href="#key-lifetime" class="auto internal xref">Appendix A.5</a> regarding Referee key lifetime.<a href="#section-5.1-3.1.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
+<p id="section-5.1-2">The client is configured to trust the Referee server's public key.  If
+this key changes, session resumption might be useful to avoid having
+the client re-configured to trust that new public key, see
+<a href="#referee-public-key-change" class="auto internal xref">Appendix A.5.2</a>.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="servers-to-referee">
@@ -1545,7 +1538,10 @@ implementation specific.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-servers-to-referee" class="section-name selfRef">Servers to Referee</a>
         </h3>
 <p id="section-5.2-1">Server names and their associated public key fingerprints have to
-be enrolled with the Referee.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+be enrolled with the Referee.  This can be automated by servers
+that support Referee, or can be done manually for servers that do not
+(yet) support Referee -- providing immediate value to Referee clients
+without waiting for server Referee support.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <div id="short-code-or-scan-code">
 <section id="section-5.2.1">
           <h4 id="name-short-code-or-scan-code">
@@ -1553,19 +1549,25 @@ be enrolled with the Referee.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
           </h4>
 <p id="section-5.2.1-1">Short code printed on the Referee-capable server which can be scanned
 by a smartphone application by the home administrator which is
-authorized to push new associations to the Referee.  Alternatively,
-the same information could be manually typed in by the home
-administrator to the Referee's management GUI or CLI.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+authorized to push new associations to the Referee.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="tofu">
+<div id="manual-configuration">
 <section id="section-5.2.2">
-          <h4 id="name-tofu">
-<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-tofu" class="section-name selfRef">TOFU</a>
+          <h4 id="name-manual-configuration">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-manual-configuration" class="section-name selfRef">Manual Configuration</a>
           </h4>
-<p id="section-5.2.2-1">A client device which leans the Referee does not have an existing
-entry for a (new) name is authorized to 'push' the (new) name and
-its public key fingerprint to the Referee.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-1">It is useful for a Referee server to provide immediate value on its
+installation, even when servers do not (yet) support Referee.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">To do so, the Referee has a user interface for manual addition of a
+server.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">The Referee might also scan the local domain network looking
+for TLS servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS,
+IMAPS, POP3S).  After finding a server, the Referee can prompt the
+user for confirmation to add the server to the Referee allow-list.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-4">To accommodate servers that change their public key but do not (yet)
+register that change with the Referee, the Referee can refresh its
+server fingerprints at user request.<a href="#section-5.2.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1633,11 +1635,11 @@ connection is made to that address, those are also considered
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-service-discovery" class="section-name selfRef">Service Discovery</a>
       </h2>
 <p id="section-7-1">To ease initial bootstrapping the client, the local domain can
-advertise its Referee server using a new DHCP option.  The client
-connects to that server using HTTPS and extracts the public key.  Each
-local domain has its own Referee which only has purview over servers
-in its same local domain.  The Refereee's public key has either not
-been seen before or has been seen before:<a href="#section-7-1" class="pilcrow">¶</a></p>
+advertise its Referee server using a new DHCP option (see <a href="#iana" class="auto internal xref">Section 10</a>).
+The client connects to that server using HTTPS and extracts the public
+key.  Each local domain has its own Referee which only has purview
+over servers in its same local domain.  The Referee's public key has
+either not been seen before or has been seen before:<a href="#section-7-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7-2.1">
           <p id="section-7-2.1.1">If the public key has not been seen before, the user needs to
@@ -1650,93 +1652,48 @@ exact method is out of scope of this document.<a href="#section-7-2.1.1" class="
 applied again.<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-7-3.1">
-          <p id="section-7-3.1.1">Discussion: the above design prevents the Referee from changing its
-  public key, even though the Referee trust anchor allows other
-  servers on the local domain (e.g., printers, file shares) to change
-  their public key.<a href="#section-7-3.1.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-7-4.1">
-          <p id="section-7-4.1.1">Discussion: To allow the Referee to change its public key, we could
-  rely on traditional PKIX-based authentication where Referee's
-  certificate is signed by a Certification Authority the client
-  already trusts.  With that, the client could bootstrap to that
-  Referee using just its name, similar to <span>[<a href="#DNR" class="cite xref">DNR</a>]</span>.  However,
-  this requires local domains have a domain name for their Referee and
-  requires the Referee be able to obtain (and renew) its CA-signed
-  certificate.  A domain name might be managed by the vendor of the
-  Referee, their ISP, or a managed service provider (MSP).  Obtaining
-  a CA-signed certificate is at least reduced to being solved with
-  just one device on the local domain (the Referee) rather than each
-  of the servers on the local network.<a href="#section-7-4.1.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-</section>
-</div>
-<div id="deploying-without-server-support">
-<section id="section-8">
-      <h2 id="name-deploying-without-server-su">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-deploying-without-server-su" class="section-name selfRef">Deploying without Server Support</a>
-      </h2>
-<p id="section-8-1">It is useful for a Referee server to provide immediate value on its
-installation, even when servers do not (yet) support Referee.  To do
-so, the Referee has a user interface for manual addition of a server.
-The Referee might also scan the local domain network looking for TLS
-servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
-POP3S).  After finding a server, the Referee can prompt the user for
-confirmation to add the server to the Referee allow-list.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">To accommodate servers that rotate their public key but do not (yet)
-register that change with the Referee, the Referee can refresh its
-server fingerprints at user request.<a href="#section-8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="operational">
-<section id="section-9">
+<section id="section-8">
       <h2 id="name-operational-considerations">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-operational-considerations" class="section-name selfRef">Operational Considerations</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-operational-considerations" class="section-name selfRef">Operational Considerations</a>
       </h2>
-<p id="section-9-1">The Referee has to always be available.  The client cache helps reduce
+<p id="section-8-1">The Referee has to always be available.  The client cache helps reduce
 load on the Referee but new clients (e.g., new devices, guest users, restored
 devices) and client cache invalidation will always cause some traffic to
-the Referee.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">When the Referee is unavailable, clients behavior devolves to what
+the Referee.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">When the Referee is unavailable, clients behavior devolves to what
 we have today:  servers will need to obtain a real PKI certificate
 signed by a Certification Authority already trusted by the clients, or
-else clients will need to manually trust individual certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
+else clients will need to manually trust individual certificates.<a href="#section-8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-10">
+<section id="section-9">
       <h2 id="name-security-considerations">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-10-1">TODO: expand security considerations.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">See <a href="#operational" class="auto internal xref">Section 9</a> describing client behavior when the Referee
-is unavailable.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-9-1">TODO: expand security considerations.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">See <a href="#operational" class="auto internal xref">Section 8</a> describing client behavior when the Referee
+is unavailable.<a href="#section-9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="iana-considerations">
-<section id="section-11">
+<div id="iana">
+<section id="section-10">
       <h2 id="name-iana-considerations">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-11-1">Register new .well_known URI for Referee server.<a href="#section-11-1" class="pilcrow">¶</a></p>
-<p id="section-11-2">Register new DHCP option for Referee server.<a href="#section-11-2" class="pilcrow">¶</a></p>
+<p id="section-10-1">Register new .well_known URI for Referee server.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Register new DHCP option for Referee server.<a href="#section-10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-12">
+<section id="section-11">
       <h2 id="name-informative-references">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
       </h2>
 <dl class="references">
-<dt id="DNR">[DNR]</dt>
-      <dd>
-<span class="refAuthor">Boucadair, M., Ed.</span>, <span class="refAuthor">Reddy.K, T., Ed.</span>, <span class="refAuthor">Wing, D.</span>, <span class="refAuthor">Cook, N.</span>, and <span class="refAuthor">T. Jensen</span>, <span class="refTitle">"DHCP and Router Advertisement Options for the Discovery of Network-designated Resolvers (DNR)"</span>, <span class="seriesInfo">RFC 9463</span>, <span class="seriesInfo">DOI 10.17487/RFC9463</span>, <time datetime="2023-11" class="refDate">November 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9463">https://www.rfc-editor.org/rfc/rfc9463</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="Homenet">[Homenet]</dt>
       <dd>
 <span class="refAuthor">Pfister, P.</span> and <span class="refAuthor">T. Lemon</span>, <span class="refTitle">"Special-Use Domain 'home.arpa.'"</span>, <span class="seriesInfo">RFC 8375</span>, <span class="seriesInfo">DOI 10.17487/RFC8375</span>, <time datetime="2018-05" class="refDate">May 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8375">https://www.rfc-editor.org/rfc/rfc8375</a>&gt;</span>. </dd>
@@ -1844,7 +1801,7 @@ example:<a href="#appendix-A.4-2" class="pilcrow">¶</a></p>
   router.fb5f73ed-275a-431e-aecf-436f0c54d69d.internal
 </pre><a href="#appendix-A.4-3" class="pilcrow">¶</a>
 </div>
-<p id="appendix-A.4-4">The Referee system is ambilvalnt about the name -- the Referee's name
+<p id="appendix-A.4-4">The Referee system is ambivalent about the name -- the Referee's name
 and each server's name need only be unique on the current local
 domain. Name collisions that occur between local domains are handled
 by the client querying the other network's trusted Referee to check
@@ -1857,7 +1814,8 @@ legitimacy.<a href="#appendix-A.4-4" class="pilcrow">¶</a></p>
 </pre><a href="#appendix-A.4-5" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.4-6">The Referee system allows keeping the unique name the same for the
-lifetime of the device while allowing changing its public key.<a href="#appendix-A.4-6" class="pilcrow">¶</a></p>
+lifetime of the device while allowing changing its public key, if
+the server informs the Referee about its public key change.<a href="#appendix-A.4-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="key-lifetime">
@@ -1865,8 +1823,8 @@ lifetime of the device while allowing changing its public key.<a href="#appendix
         <h3 id="name-key-lifetime-rotating-publi">
 <a href="#appendix-A.5" class="section-number selfRef">A.5. </a><a href="#name-key-lifetime-rotating-publi" class="section-name selfRef">Key Lifetime (Rotating Public Key)</a>
         </h3>
-<p id="appendix-A.5-1">For security hygiene, the public keys in a server and in the Referee
-are occasionally changed. This section discusses how such changes are
+<p id="appendix-A.5-1">For security hygiene, the public keys in a server and the Referee may
+be occasionally changed. This section discusses how such changes are
 handled by a Referee system.<a href="#appendix-A.5-1" class="pilcrow">¶</a></p>
 <div id="server">
 <section id="appendix-A.5.1">
@@ -1889,23 +1847,24 @@ unencrypted connections, which is the case today.<a href="#appendix-A.5.1-2.1.1"
           </ul>
 </section>
 </div>
-<div id="referee-1">
+<div id="referee-public-key-change">
 <section id="appendix-A.5.2">
           <h4 id="name-referee-2">
 <a href="#appendix-A.5.2" class="section-number selfRef">A.5.2. </a><a href="#name-referee-2" class="section-name selfRef">Referee</a>
           </h4>
 <p id="appendix-A.5.2-1">If the Referee's public key changes all the clients have to
 re-authenticate the Referee's new public key.  This is uncool.<a href="#appendix-A.5.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.5.2-2">To allow changing the Referee's public key without client
-re-authentication, the client and Referee could do session resumption
-for its subsequent connections to the Referee (Section 2.2 of
-<span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>).  When doing session resumption with the Referee, the
-client should also retrieve and cache the Referee's current public key
-fingerprint so if, in the future, the Referee cannot perform session
-resumption the client can still authenticate the Referee.<a href="#appendix-A.5.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.5.2-2">To allow changing the Referee's public key without needing the client
+to re-authenticate the Referee, the client and Referee could do
+session resumption for its subsequent connections to the Referee
+(Section 2.2 of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>).  If session resumption succeeds, the
+client can query a the Referee's own well-known URI to determine if
+the Referee's public key has changed, and update itself accordingly.<a href="#appendix-A.5.2-2" class="pilcrow">¶</a></p>
 <p id="appendix-A.5.2-3">With the above technique, the client will only have to (manually)
 re-authenticate the Referee when the Referee cannot perform session
-resumption.<a href="#appendix-A.5.2-3" class="pilcrow">¶</a></p>
+resumption.  As session resumption is usually implemented using the
+server's private key, the Referee would need to remember its previous
+private key (or two or three).<a href="#appendix-A.5.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
