@@ -82,8 +82,9 @@ differ from other trust anchor systems:
 * requires an always-on Referee server to authenticate servers on
   the local domain,
 
-* can use raw public keys, as the dates and signatures of certificates
-  are ignored by this system, in favor of consulting the Referee,
+* can use raw public keys, as the dates and certificate signatures of
+  servers on the local domain are ignored by this system, in favor of
+  consulting the Referee,
 
 * handles name collisions for servers on different networks, so two
   different networks can both have servers with the same name (e.g.,
@@ -91,14 +92,15 @@ differ from other trust anchor systems:
 
 * handles unique names for servers (e.g., router-abcdef123456.local),
 
-* implemented almost entirely by client software and a Referee server
-  (which is an HTTPS server serving files and management interface to
-  add new name and public key), so servers on the local domain need only
-  avoid changing their public keys to participate in the Referee
-  system,
+* the client validates a server is authorized on the local domain via
+  an HTTPS query to the (Referee) server on the local domain, rather than
+  a signed certificate,
 
-* Servers that want to participate in the Referee system can change
-  their public keys periodicially and inform the Referee, which allows
+* can operate without changes to servers on the local domain, provided
+  server does not change its public key, and
+
+* Servers that participate in the Referee system can change their
+  public keys periodicially and inform the Referee, which allows
   clients to automatically handle those public key changes.
 
 
