@@ -12,7 +12,7 @@ v: 3
 # area: AREA
 # workgroup: WG Working Group
 keyword:
- - home servers
+ - local domain
  - tls
  - tofu
 
@@ -41,13 +41,13 @@ informative:
 
 --- abstract
 
-Obtaining and maintaining PKI certificates for devices in a home
-network is difficult for both technical and human factors
+Obtaining and maintaining PKI certificates for devices in a local
+domain network is difficult for both technical and human factors
 reasons. This document describes an alternative approach to securely
-identify and authenticate home servers using a HTTP-based trust anchor
-system, called a Referee.  The Referee allows bootstrapping a network
-of devices by trusting only the Referee trust anchor in the local
-domain.
+identify and authenticate servers in the local domain using a
+HTTPS-based trust anchor system, called a Referee.  The Referee allows
+bootstrapping a network of devices by trusting only the Referee trust
+anchor in the local domain.
 
 --- middle
 
@@ -55,12 +55,12 @@ domain.
 
 Most existing TLS communications require the server obtaining a
 certificate signed by a Certification Authority trusted by the client.
-Within a home network this is fraught with complications of both
+Within a local domain network this is fraught with complications of both
 human factors and technical natures (e.g., local domain firewall,
 lack of domain name).
 
 This document describes a trust anchor system to authorize the
-legitimate servers on a local domain.  The trust anchor host, called a
+legitimate servers on the local domain.  The trust anchor host, called a
 Referee, helps clients identify and authenticate previously-enrolled
 servers within the local domain.  The Referee system purposefully
 avoids Public Key Infrastructure using X.509 {{?PKIX=RFC5280}},
@@ -73,6 +73,33 @@ HTTP query the local domain's pre-authorized Referee system to learn
 if that server has been enrolled with the Referee.  If so, it
 indicates the server was enrolled in the Referee trust anchor and the
 TLS connection can continue.
+
+# Unique Characteristics
+
+The system described in this draft has several characteristics that
+differ from other trust anchor systems:
+
+* requires an always-on Referee server to authenticate servers on
+  the local domain,
+
+* can use raw public keys, as the dates and signatures of certificates
+  are ignored by this system, in favor of consulting the Referee,
+
+* handles name collisions for servers on different networks, so two
+  different networks can both have servers with the same name (e.g.,
+  router.local),
+
+* handles unique names for servers (e.g., router-abcdef123456.local),
+
+* implemented almost entirely by client software and a Referee server
+  (which is an HTTPS server serving files and management interface to
+  add new name and public key), so servers on the local domain need only
+  avoid changing their public keys to participate in the Referee
+  system,
+
+* Servers that want to participate in the Referee system can change
+  their public keys periodicially and inform the Referee, which allows
+  clients to automatically handle those public key changes.
 
 
 # Requirements Evaluation
@@ -91,23 +118,28 @@ document has the following summarized characteristics:
 ## Referee
 
 The Referee trust anchor function is implemented within any always-on
-device within the home (e.g., router, smart home hub, NAS).  The
-Referee contains a database of local hostnames and their Referee
-public key fingerprints.
+device within the local domain (e.g., router, smart home hub, NAS, or
+a virtualized CPE).  The Referee runs HTTPS and serves files
+containing public key fingerprints indexed by each server's local
+domain name.
 
 The Referee on a local network is named "referee.internal", but
 that can be changed with autodiscovery (see {{discovery}}).
 
 Clients authenticate to the Referee and use HTTP GET to fetch the
 named public key fingerprint from the Referee server.  For example to
-get public key fingerprint of a server named printer.internal,
+get public key fingerprint of a server named
+printer-abcdef123.internal and a server named router.local, the
+following two GETs would be issued:
 
 ~~~~
+  GET /.well-known/referee/sha256/printer-abcdef123.internal HTTP/1.1
   GET /.well-known/referee/sha256/printer.internal HTTP/1.1
 ~~~~
 
-The public key fingerprint is SHA-256 of the server's public key
-returned as an octet-stream.
+The data returned is the SHA-256 fingerprint of the server's public
+key returned as an octet-stream.
+
 
 ## Servers
 
@@ -116,7 +148,7 @@ A server supporting this specification is expected to be a printer
 router (especially its HTTPS-based management console or its ssh
 server), or similar.
 
-Each in-home device supporting Referee has a fixed public key, which
+Each local domain device supporting Referee has a fixed public key, which
 persists for the lifetime of the device.  During installation of the
 device to a Referee network, the device's hostname and public key
 fingerprint are stored into the Referee Server.  Several options
@@ -140,10 +172,16 @@ Referee for its own local domain.
 
 On a connection to a server on the local domain (see {{local}}) the
 client includes the server's local domain name in the TLS Server Name
-Indication (SNI) extension of its ClientHello.  On receiving the
-server's certificate in the TLS exchange, one of two situations will
-occur: the client has not previously cached the association of that
-hostname to that public key or it has cached that information.
+Indication (SNI) extension of its ClientHello.  A client MAY cache
+authorized servers on that same local domain, after the client has
+completed a TLS handshake to the Referee to verify the client is
+connected to that Referee's network.  Upon disconnection from that
+network, the client invalidates its cache until connected to a new
+network and validating that network's Referee.
+
+On receiving the server's certificate in the TLS exchange, the
+client will have previously cached that server+Referee combination,
+or not, as discussed below:
 
 * If not previously cached, the client queries that network's Referee
 with the DNS name of the server (e.g., printer.internal).  The Referee
@@ -165,13 +203,16 @@ TLS handshake.  If they match, the client replaces the information in
 its cache.
 
 Internally, a client might form a unique identity for a local domain
-server as hostname (e.g., printer.local) combined with the identity
-of the Referee, such as the Referee's public key fingerprint.  In this
-way, when the client is on a different network (which will have a
-different Referee), a server name collision (e.g., local.printer) will
-result in a unique internal identity for that server -- keeping all
-the server-specific data separate (e.g., web forms, passwords, local
-storage, etc.).
+server as hostname (e.g., printer.local) combined with the identity of
+the Referee, such as the Referee's public key fingerprint (if not
+signed by a global Certification Authority) or the Referee's name (if
+signed by a global Certification Authority).  In this way, when the
+client is on a different network (which will have a different
+Referee), a server name collision (e.g., local.printer) will result in
+a unique internal identity for that server -- keeping all the
+server-specific data separate for those two servers on different
+networks (e.g., web forms, passwords, local
+storage, etc.)
 
 
 ## Revoking Authorization
