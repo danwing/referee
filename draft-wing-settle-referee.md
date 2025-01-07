@@ -300,8 +300,7 @@ connection is made to that address, those are also considered
 TODO: needs more detail and discussion.
 
 To ease initial bootstrapping the client, the local domain can
-advertise its Referee server using a SRV resource record of
-"referee._http._tcp.local" using {{?DNS-SD=RFC6763}}.  The client
+advertise its Referee server using a new DHCP option.  The client
 connects to that server using HTTPS and extracts the public key.  That
 public key has either not been seen before or has been seen before:
 
@@ -312,7 +311,6 @@ public key has either not been seen before or has been seen before:
 * If the public key has been seen before, and was previously approved
   (or previously rejected) by the user, that same user decision is
   applied again.
-
 
 > Discussion: the above design prevents the Referee from changing its
   public key, even though the Referee trust anchor allows other
@@ -331,10 +329,6 @@ public key has either not been seen before or has been seen before:
   a CA-signed certificate is at least reduced to being solved with
   just one device on the local domain (the Referee) rather than each
   of the servers on the local network.
-
-> Discussion: DHCP and RA could be specified instead of (or in
-  addition to) DNS-SD.
-
 
 
 # Operational Notes {#operational-notes}
@@ -362,9 +356,9 @@ is unavailable.
 
 # IANA Considerations
 
-Register new .well_known URI for "referee" server.
+Register new .well_known URI for Referee server.
 
-TODO: service discovery to find Referee's DNS name.
+Register new DHCP option for Referee server.
 
 --- back
 
