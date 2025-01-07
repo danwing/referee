@@ -297,12 +297,12 @@ connection is made to that address, those are also considered
 
 # Service Discovery {#discovery}
 
-TODO: needs more detail and discussion.
-
 To ease initial bootstrapping the client, the local domain can
 advertise its Referee server using a new DHCP option.  The client
-connects to that server using HTTPS and extracts the public key.  That
-public key has either not been seen before or has been seen before:
+connects to that server using HTTPS and extracts the public key.  Each
+local domain has its own Referee which only has purview over servers
+in its same local domain.  The Refereee's public key has either not
+been seen before or has been seen before:
 
 * If the public key has not been seen before, the user needs to
   approve use of that Referee trust anchor for this local domain; the
@@ -311,6 +311,7 @@ public key has either not been seen before or has been seen before:
 * If the public key has been seen before, and was previously approved
   (or previously rejected) by the user, that same user decision is
   applied again.
+
 
 > Discussion: the above design prevents the Referee from changing its
   public key, even though the Referee trust anchor allows other
@@ -331,6 +332,21 @@ public key has either not been seen before or has been seen before:
   of the servers on the local network.
 
 
+# Deploying without Server Support
+
+It is useful for a Referee server to provide immediate value on its
+installation, even when servers do not (yet) support Referee.  To do
+so, the Referee has a user interface for manual addition of a server.
+The Referee might also scan the local domain network looking for TLS
+servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
+POP3S).  After finding a server, the Referee can prompt the user for
+confirmation to add the server to the Referee allow-list.
+
+To accommodate servers that rotate their public key but do not (yet)
+register that change with the Referee, the Referee can refresh its
+server fingerprints at user request.
+
+
 # Operational Considerations {#operational}
 
 The Referee has to always be available.  The client cache helps reduce
@@ -342,18 +358,6 @@ When the Referee is unavailable, clients behavior devolves to what
 we have today:  servers will need to obtain a real PKI certificate
 signed by a Certification Authority already trusted by the clients, or
 else clients will need to manually trust individual certificates.
-
-It is useful for a Referee server to provide immediate value on its
-installation, even when servers do not (yet) support Referee.  To do
-so, the Referee scans the local domain network looking for TLS servers
-on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS, POP3S).
-After finding a server, the Referee either quietly TOFUs that server
-or prompts the user for confirmation of that server.  To accommodate
-servers that rotate their public key but do not (yet) register that
-change with the Referee, the Referee might refresh its database at
-user request.  As servers are updated to support Referee and bootstrap
-themselves to the Referee, such unpalatable scanning will become less
-useful.
 
 # Security Considerations
 
