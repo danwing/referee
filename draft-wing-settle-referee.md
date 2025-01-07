@@ -100,12 +100,14 @@ differ from other trust anchor systems:
 
 * handles unique names for servers (e.g., router-abcdef123456.local),
 
-* can operate without changes to servers on the local domain, provided
-  server does not change its public key, and
-
-* Servers that participate in the Referee system can change their
+* servers that participate in the Referee system can change their
   public keys periodically and inform the Referee, which allows
-  clients to automatically handle those public key changes.
+  clients to automatically handle those public key changes, and
+
+* can operate without changes to non-Referee servers on the local
+  domain, provided such servers do not change their public
+  keys.
+
 
 
 # Requirements Evaluation
@@ -277,8 +279,9 @@ association on the Referee.
 
 To accommodate servers that change their public key but do not (yet)
 register that change with the Referee, the Referee can refresh its
-server fingerprints at user request.
-
+server fingerprints at user request.  The user request might be
+initiated by the administrator or an HTTP message from the client
+to the Referee of a key mismatch.
 
 # Identifying Servers as Local {#local}
 
