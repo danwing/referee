@@ -88,7 +88,7 @@ Table of Contents
      6.1.  Local Domain Names
      6.2.  Local IP Addresses
    7.  Service Discovery
-   8.  Operational Notes
+   8.  Operational Considerations
    9.  Security Considerations
    10. IANA Considerations
    11. Informative References
@@ -390,7 +390,7 @@ Table of Contents
       solved with just one device on the local domain (the Referee)
       rather than each of the servers on the local network.
 
-8.  Operational Notes
+8.  Operational Considerations
 
    The Referee has to always be available.  The client cache helps
    reduce load on the Referee but new clients (e.g., new devices, guest
@@ -401,6 +401,18 @@ Table of Contents
    have today: servers will need to obtain a real PKI certificate signed
    by a Certification Authority already trusted by the clients, or else
    clients will need to manually trust individual certificates.
+
+   It is useful for a Referee server to provide immediate value on its
+   installation, even when servers do not (yet) support Referee.  To do
+   so, the Referee scans the local domain network looking for TLS
+   servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
+   POP3S).  After finding a server, the Referee either quietly TOFUs
+   that server or prompts the user for confirmation of that server.  To
+   accommodate servers that rotate their public key but do not (yet)
+   register that change with the Referee, the Referee might refresh its
+   database at user request.  As servers are updated to support Referee
+   and bootstrap themselves to the Referee, such unpalatable scanning
+   will become less useful.
 
 9.  Security Considerations
 

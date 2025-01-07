@@ -1219,7 +1219,7 @@ anchor in the local domain.<a href="#section-abstract-1" class="pilcrow">¶</a><
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-service-discovery" class="internal xref">Service Discovery</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-operational-notes" class="internal xref">Operational Notes</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-operational-considerations" class="internal xref">Operational Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
             <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
@@ -1672,10 +1672,10 @@ applied again.<a href="#section-7-3.2.1" class="pilcrow">¶</a></p>
       </ul>
 </section>
 </div>
-<div id="operational-notes">
+<div id="operational">
 <section id="section-8">
-      <h2 id="name-operational-notes">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-operational-notes" class="section-name selfRef">Operational Notes</a>
+      <h2 id="name-operational-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-operational-considerations" class="section-name selfRef">Operational Considerations</a>
       </h2>
 <p id="section-8-1">The Referee has to always be available.  The client cache helps reduce
 load on the Referee but new clients (e.g., new devices, guest users, restored
@@ -1685,6 +1685,17 @@ the Referee.<a href="#section-8-1" class="pilcrow">¶</a></p>
 we have today:  servers will need to obtain a real PKI certificate
 signed by a Certification Authority already trusted by the clients, or
 else clients will need to manually trust individual certificates.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-3">It is useful for a Referee server to provide immediate value on its
+installation, even when servers do not (yet) support Referee.  To do
+so, the Referee scans the local domain network looking for TLS servers
+on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS, POP3S).
+After finding a server, the Referee either quietly TOFUs that server
+or prompts the user for confirmation of that server.  To accommodate
+servers that rotate their public key but do not (yet) register that
+change with the Referee, the Referee might refresh its database at
+user request.  As servers are updated to support Referee and bootstrap
+themselves to the Referee, such unpalatable scanning will become less
+useful.<a href="#section-8-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -1693,7 +1704,7 @@ else clients will need to manually trust individual certificates.<a href="#secti
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 <p id="section-9-1">TODO: expand security considerations.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">See <a href="#operational-notes" class="auto internal xref">Section 8</a> describing client behavior when the Referee
+<p id="section-9-2">See <a href="#operational" class="auto internal xref">Section 8</a> describing client behavior when the Referee
 is unavailable.<a href="#section-9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
