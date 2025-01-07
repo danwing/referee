@@ -242,32 +242,42 @@ The clients have to be configured to trust their Referee. This is
 a one time activity, for each home network the client joins.  This
 can be somewhat automated using service discovery ({{discovery}}).
 
-Until service discovery is defined for a Referee system, the client
-has to be configured to trust the Referee server's public key
-fingerprint.  This can be done manually or using TOFU, and is
-implementation specific.
+The client is configured to trust the Referee server's public key.  If
+this key changes, session resumption might be useful to avoid having
+the client re-configured to trust that new public key, see
+{{referee-public-key-change}}.
 
-> for discussion: see {{key-lifetime}} regarding Referee key lifetime.
 
 ## Servers to Referee
 
 Server names and their associated public key fingerprints have to
-be enrolled with the Referee.
+be enrolled with the Referee.  This can be automated by servers
+that support Referee, or can be done manually for servers that do not
+(yet) support Referee -- providing immediate value to Referee clients
+without waiting for server Referee support.
 
 ### Short Code or Scan Code
 
 Short code printed on the Referee-capable server which can be scanned
 by a smartphone application by the home administrator which is
-authorized to push new associations to the Referee.  Alternatively,
-the same information could be manually typed in by the home
-administrator to the Referee's management GUI or CLI.
+authorized to push new associations to the Referee.
 
-### TOFU
+### Manual Configuration
 
-A client device which leans the Referee does not have an existing
-entry for a (new) name is authorized to 'push' the (new) name and
-its public key fingerprint to the Referee.
+It is useful for a Referee server to provide immediate value on its
+installation, even when servers do not (yet) support Referee.
 
+To do so, the Referee has a user interface for manual addition of a
+server.
+
+The Referee might also scan the local domain network looking
+for TLS servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS,
+IMAPS, POP3S).  After finding a server, the Referee can prompt the
+user for confirmation to add the server to the Referee allow-list.
+
+To accommodate servers that change their public key but do not (yet)
+register that change with the Referee, the Referee can refresh its
+server fingerprints at user request.
 
 
 # Identifying Servers as Local {#local}
@@ -312,21 +322,6 @@ either not been seen before or has been seen before:
 * If the public key has been seen before, and was previously approved
   (or previously rejected) by the user, that same user decision is
   applied again.
-
-
-# Deploying without Server Support
-
-It is useful for a Referee server to provide immediate value on its
-installation, even when servers do not (yet) support Referee.  To do
-so, the Referee has a user interface for manual addition of a server.
-The Referee might also scan the local domain network looking for TLS
-servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
-POP3S).  After finding a server, the Referee can prompt the user for
-confirmation to add the server to the Referee allow-list.
-
-To accommodate servers that change their public key but do not (yet)
-register that change with the Referee, the Referee can refresh its
-server fingerprints at user request.
 
 
 # Operational Considerations {#operational}
@@ -440,17 +435,18 @@ unencrypted connections, which is the case today.
 If the Referee's public key changes all the clients have to
 re-authenticate the Referee's new public key.  This is uncool.
 
-To allow changing the Referee's public key without client
-re-authentication, the client and Referee could do session resumption
-for its subsequent connections to the Referee (Section 2.2 of
-{{?RFC8446}}).  When doing session resumption with the Referee, the
-client should also retrieve and cache the Referee's current public key
-fingerprint so if, in the future, the Referee cannot perform session
-resumption the client can still authenticate the Referee.
+To allow changing the Referee's public key without needing the client
+to re-authenticate the Referee, the client and Referee could do
+session resumption for its subsequent connections to the Referee
+(Section 2.2 of {{?RFC8446}}).  If session resumption succeeds, the
+client can query a the Referee's own well-known URI to determine if
+the Referee's public key has changed, and update itself accordingly.
 
 With the above technique, the client will only have to (manually)
 re-authenticate the Referee when the Referee cannot perform session
-resumption.
+resumption.  As session resumption is usually implemented using the
+server's private key, the Referee would need to remember its previous
+private key (or two or three).
 
 ## Incrementatal Adoption
 
