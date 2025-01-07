@@ -1314,28 +1314,31 @@ differ from other trust anchor systems:<a href="#section-2-1" class="pilcrow">¶
 the local domain,<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.2">
-          <p id="section-2-2.2.1">can use raw public keys, as the dates and signatures of certificates
-are ignored by this system, in favor of consulting the Referee,<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.2.1">the client validates a server is authorized on the local domain via
+an HTTPS query to the (Referee) server on the local domain, rather than
+a signed certificate,<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.3">
-          <p id="section-2-2.3.1">handles name collisions for servers on different networks, so two
-different networks can both have servers with the same name (e.g.,
-router.local),<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.3.1">can use raw public keys, as the dates and certificate signatures of
+servers on the local domain are ignored by this system, in favor of
+consulting the Referee,<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.4">
-          <p id="section-2-2.4.1">handles unique names for servers (e.g., router-abcdef123456.local),<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.4.1">handles name collisions for servers on different networks, so two
+different networks can both have servers with the same name (e.g.,
+router.local),<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.5">
-          <p id="section-2-2.5.1">implemented almost entirely by client software and a Referee server
-(which is an HTTPS server serving files and management interface to
-add new name and public key), so servers on the local domain need only
-avoid changing their public keys to participate in the Referee
-system,<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.5.1">handles unique names for servers (e.g., router-abcdef123456.local),<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.6">
-          <p id="section-2-2.6.1">Servers that want to participate in the Referee system can change
-their public keys periodicially and inform the Referee, which allows
-clients to automatically handle those public key changes.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.6.1">can operate without changes to servers on the local domain, provided
+server does not change its public key, and<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.7">
+          <p id="section-2-2.7.1">Servers that participate in the Referee system can change their
+public keys periodicially and inform the Referee, which allows
+clients to automatically handle those public key changes.<a href="#section-2-2.7.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
