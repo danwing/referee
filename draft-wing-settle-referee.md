@@ -262,20 +262,24 @@ Short code printed on the Referee-capable server which can be scanned
 by a smartphone application by the home administrator which is
 authorized to push new associations to the Referee.
 
-### Manual Configuration
+### Incremental Deployment and Manual Referee Configuration
 
 It is useful for a Referee server to provide immediate value on its
-installation, even when servers do not (yet) support Referee.
+installation, even when servers do not (yet) support Referee.  The
+Referee system requires support of both the client (to ask the Referee
+for mediation) and installation of a Referee -- which could be in the
+home router, NAS, or other always-on device.  This section explores
+how to bootstrap Referee system when servers on the local domain
+do not (yet) support Referee.
 
-To do so, the Referee has a user interface for manual addition of a
+The Referee has a user interface for manual addition of a
 server.  For example the user might cause the Referee to connect to a
 server on the local domain using TLS, extract its public key, and
 create the hostname and public key fingerprint association on the
 Referee.  Additionally, the Referee might also scan the local domain
 network looking for TLS servers on common ports (e.g., HTTPS, IMAPS,
 IPPS, NNTPS, IMAPS, POP3S) to enumerate a list of servers for the
-user to approve and create the hostname and public key fingerprint
-association on the Referee.
+user to approve the same association on the Referee.
 
 To accommodate servers that change their public key but do not (yet)
 register that change with the Referee, the Referee can refresh its
@@ -445,13 +449,6 @@ resumption.  As session resumption is usually implemented using the
 server's private key, the Referee would need to remember its previous
 private key (or two or three).
 
-## Incrementatal Adoption
-
-The Referee system requires support of both the client (to ask the
-Referee for mediation) and installation of a Referee -- which could be
-in the home router, NAS, or other always-on device.  This section
-explores how to bootstrap Referee system even when the server does
-not (yet) support Referee.
 
 
 
