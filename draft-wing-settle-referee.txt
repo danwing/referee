@@ -101,7 +101,6 @@ Table of Contents
        A.5.1.  Server
        A.5.2.  Referee
      A.6.  Incrementatal Adoption
-       A.6.1.  Server Does Not Support Referee
    Acknowledgments
    Author's Address
 
@@ -199,18 +198,16 @@ Table of Contents
 
    A server supporting this specification is expected to be a printer
    (using IPPS or HTTPS), file server (e.g., NAS or laptop), IoT device,
-   router (especially its HTTPS-based management console or its ssh
-   server), or similar.
+   router (especially its HTTPS-based management console), or similar.
 
-   Each local domain device supporting Referee has a fixed public key,
-   which persists for the lifetime of the device.  During installation
-   of the device to a Referee network, the device's hostname and public
-   key fingerprint are stored into the Referee Server.  Several options
-   exist for this step, detailed in Section 5.
+   Each local domain device supporting Referee has a public key.  During
+   installation of the device to a Referee network, the device's
+   hostname and public key fingerprint are stored into the Referee
+   Server.  Several options exist for this step, detailed in Section 5.
 
-   If a server's public key changes (e.g., factory reset, public key
-   algorithm, key length) the new key needs to be enrolled with the
-   Referee and the old key removed (see Appendix A.5).  Clients will
+   If a server's public key changes (e.g., factory reset, key rotation,
+   public key algorithm change) the new key needs to be enrolled with
+   the Referee and the old key removed (see Appendix A.5).  Clients will
    notice the mismatch and will query the Referee, which provides the
    new key's fingerprint, authenticating the server (with its new key)
    to the client.
@@ -319,12 +316,14 @@ Table of Contents
    installation, even when servers do not (yet) support Referee.
 
    To do so, the Referee has a user interface for manual addition of a
-   server.
-
-   The Referee might also scan the local domain network looking for TLS
-   servers on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS,
-   POP3S).  After finding a server, the Referee can prompt the user for
-   confirmation to add the server to the Referee allow-list.
+   server.  For example the user might cause the Referee to connect to a
+   server on the local domain using TLS, extract its public key, and
+   create the hostname and public key fingerprint association on the
+   Referee.  Additionally, the Referee might also scan the local domain
+   network looking for TLS servers on common ports (e.g., HTTPS, IMAPS,
+   IPPS, NNTPS, IMAPS, POP3S) to enumerate a list of servers for the
+   user to approve and create the hostname and public key fingerprint
+   association on the Referee.
 
    To accommodate servers that change their public key but do not (yet)
    register that change with the Referee, the Referee can refresh its
@@ -502,21 +501,17 @@ A.4.  Unique Names
 
      printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
      nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
-     router.fb5f73ed-275a-431e-aecf-436f0c54d69d.internal
+     router.fb5f73ed-275a-431e-aecf-436f0c54d69d.local
 
-   The Referee system is ambivalent about the name -- the Referee's name
-   and each server's name need only be unique on the current local
+   The Referee system is ambivalent about the host name -- the Referee's
+   name and each server's name need only be unique on the current local
    domain.  Name collisions that occur between local domains are handled
    by the client querying the other network's trusted Referee to check
    legitimacy.
 
-     printer.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
-     nas.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
-     router.ee80be87-3e00-4c7f-a366-5b57fce4c999.internal
-
    The Referee system allows keeping the unique name the same for the
-   lifetime of the device while allowing changing its public key, if the
-   server informs the Referee about its public key change.
+   lifetime of the device while allowing changing its public key, as
+   discussed in the following section.
 
 A.5.  Key Lifetime (Rotating Public Key)
 
@@ -565,23 +560,6 @@ A.6.  Incrementatal Adoption
    be in the home router, NAS, or other always-on device.  This section
    explores how to bootstrap Referee system even when the server does
    not (yet) support Referee.
-
-A.6.1.  Server Does Not Support Referee
-
-   In the case a server does not support Referee, it will not register
-   itself with the network's Referee.
-
-   The Referee could be told by a network administrator to connect to
-   such a server, extract public key, and install that public key and
-   name into the Referee.  When a Referee-capable client connects to
-   that server and receives a certificate signed by a Certification
-   Authority the client does not trust, and that server is on a local
-   domain, the client can query the Referee for the server's public key.
-   The Referee responds with the server's public key which the client
-   compares to the server's public key in the TLS handshake.  If they
-   match, the client has finished authentication with the server.  If
-   they don't match, the client considers the TLS handshake to have
-   failed and displays an error.
 
 Acknowledgments
 
