@@ -1330,13 +1330,14 @@ router.local),<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
           <p id="section-2-2.5.1">handles unique names for servers (e.g., router-abcdef123456.local),<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.6">
-          <p id="section-2-2.6.1">can operate without changes to servers on the local domain, provided
-server does not change its public key, and<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.6.1">servers that participate in the Referee system can change their
+public keys periodically and inform the Referee, which allows
+clients to automatically handle those public key changes, and<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.7">
-          <p id="section-2-2.7.1">Servers that participate in the Referee system can change their
-public keys periodically and inform the Referee, which allows
-clients to automatically handle those public key changes.<a href="#section-2-2.7.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.7.1">can operate without changes to non-Referee servers on the local
+domain, provided such servers do not change their public
+keys.<a href="#section-2-2.7.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -1563,7 +1564,9 @@ user to approve and create the hostname and public key fingerprint
 association on the Referee.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-3">To accommodate servers that change their public key but do not (yet)
 register that change with the Referee, the Referee can refresh its
-server fingerprints at user request.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+server fingerprints at user request.  The user request might be
+initiated by the administrator or an HTTP message from the client
+to the Referee of a key mismatch.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
