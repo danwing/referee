@@ -1201,7 +1201,7 @@ anchor in the local domain.<a href="#section-abstract-1" class="pilcrow">¶</a><
                     <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-short-code-or-scan-code" class="internal xref">Short Code or Scan Code</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
-                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-manual-configuration" class="internal xref">Manual Configuration</a></p>
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-incremental-deployment-and-" class="internal xref">Incremental Deployment and Manual Referee Configuration</a></p>
 </li>
                 </ul>
 </li>
@@ -1258,9 +1258,6 @@ anchor in the local domain.<a href="#section-abstract-1" class="pilcrow">¶</a><
                     <p id="section-toc.1-1.12.2.5.2.2.1"><a href="#appendix-A.5.2" class="auto internal xref">A.5.2</a>.  <a href="#name-referee-2" class="internal xref">Referee</a></p>
 </li>
                 </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.6">
-                <p id="section-toc.1-1.12.2.6.1"><a href="#appendix-A.6" class="auto internal xref">A.6</a>.  <a href="#name-incrementatal-adoption" class="internal xref">Incrementatal Adoption</a></p>
 </li>
             </ul>
 </li>
@@ -1546,22 +1543,26 @@ by a smartphone application by the home administrator which is
 authorized to push new associations to the Referee.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="manual-configuration">
+<div id="incremental-deployment-and-manual-referee-configuration">
 <section id="section-5.2.2">
-          <h4 id="name-manual-configuration">
-<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-manual-configuration" class="section-name selfRef">Manual Configuration</a>
+          <h4 id="name-incremental-deployment-and-">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-incremental-deployment-and-" class="section-name selfRef">Incremental Deployment and Manual Referee Configuration</a>
           </h4>
 <p id="section-5.2.2-1">It is useful for a Referee server to provide immediate value on its
-installation, even when servers do not (yet) support Referee.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-2">To do so, the Referee has a user interface for manual addition of a
+installation, even when servers do not (yet) support Referee.  The
+Referee system requires support of both the client (to ask the Referee
+for mediation) and installation of a Referee -- which could be in the
+home router, NAS, or other always-on device.  This section explores
+how to bootstrap Referee system when servers on the local domain
+do not (yet) support Referee.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">The Referee has a user interface for manual addition of a
 server.  For example the user might cause the Referee to connect to a
 server on the local domain using TLS, extract its public key, and
 create the hostname and public key fingerprint association on the
 Referee.  Additionally, the Referee might also scan the local domain
 network looking for TLS servers on common ports (e.g., HTTPS, IMAPS,
 IPPS, NNTPS, IMAPS, POP3S) to enumerate a list of servers for the
-user to approve and create the hostname and public key fingerprint
-association on the Referee.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+user to approve the same association on the Referee.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-3">To accommodate servers that change their public key but do not (yet)
 register that change with the Referee, the Referee can refresh its
 server fingerprints at user request.  The user request might be
@@ -1859,18 +1860,6 @@ server's private key, the Referee would need to remember its previous
 private key (or two or three).<a href="#appendix-A.5.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-</section>
-</div>
-<div id="incrementatal-adoption">
-<section id="appendix-A.6">
-        <h3 id="name-incrementatal-adoption">
-<a href="#appendix-A.6" class="section-number selfRef">A.6. </a><a href="#name-incrementatal-adoption" class="section-name selfRef">Incrementatal Adoption</a>
-        </h3>
-<p id="appendix-A.6-1">The Referee system requires support of both the client (to ask the
-Referee for mediation) and installation of a Referee -- which could be
-in the home router, NAS, or other always-on device.  This section
-explores how to bootstrap Referee system even when the server does
-not (yet) support Referee.<a href="#appendix-A.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
