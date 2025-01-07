@@ -82,6 +82,10 @@ differ from other trust anchor systems:
 * requires an always-on Referee server to authenticate servers on
   the local domain,
 
+* the client validates a server is authorized on the local domain via
+  an HTTPS query to the (Referee) server on the local domain, rather than
+  a signed certificate,
+
 * can use raw public keys, as the dates and certificate signatures of
   servers on the local domain are ignored by this system, in favor of
   consulting the Referee,
@@ -91,10 +95,6 @@ differ from other trust anchor systems:
   router.local),
 
 * handles unique names for servers (e.g., router-abcdef123456.local),
-
-* the client validates a server is authorized on the local domain via
-  an HTTPS query to the (Referee) server on the local domain, rather than
-  a signed certificate,
 
 * can operate without changes to servers on the local domain, provided
   server does not change its public key, and
