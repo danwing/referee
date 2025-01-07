@@ -331,7 +331,7 @@ public key has either not been seen before or has been seen before:
   of the servers on the local network.
 
 
-# Operational Notes {#operational-notes}
+# Operational Considerations {#operational}
 
 The Referee has to always be available.  The client cache helps reduce
 load on the Referee but new clients (e.g., new devices, guest users, restored
@@ -343,15 +343,24 @@ we have today:  servers will need to obtain a real PKI certificate
 signed by a Certification Authority already trusted by the clients, or
 else clients will need to manually trust individual certificates.
 
+It is useful for a Referee server to provide immediate value on its
+installation, even when servers do not (yet) support Referee.  To do
+so, the Referee scans the local domain network looking for TLS servers
+on common ports (e.g., HTTPS, IMAPS, IPPS, NNTPS, IMAPS, POP3S).
+After finding a server, the Referee either quietly TOFUs that server
+or prompts the user for confirmation of that server.  To accommodate
+servers that rotate their public key but do not (yet) register that
+change with the Referee, the Referee might refresh its database at
+user request.  As servers are updated to support Referee and bootstrap
+themselves to the Referee, such unpalatable scanning will become less
+useful.
 
 # Security Considerations
 
 TODO: expand security considerations.
 
-See {{operational-notes}} describing client behavior when the Referee
+See {{operational}} describing client behavior when the Referee
 is unavailable.
-
-
 
 
 # IANA Considerations
