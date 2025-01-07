@@ -1631,8 +1631,7 @@ connection is made to that address, those are also considered
       </h2>
 <p id="section-7-1">TODO: needs more detail and discussion.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">To ease initial bootstrapping the client, the local domain can
-advertise its Referee server using a SRV resource record of
-"referee._http._tcp.local" using <span>[<a href="#DNS-SD" class="cite xref">DNS-SD</a>]</span>.  The client
+advertise its Referee server using a new DHCP option.  The client
 connects to that server using HTTPS and extracts the public key.  That
 public key has either not been seen before or has been seen before:<a href="#section-7-2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1671,12 +1670,6 @@ applied again.<a href="#section-7-3.2.1" class="pilcrow">¶</a></p>
   of the servers on the local network.<a href="#section-7-5.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-7-6.1">
-          <p id="section-7-6.1.1">Discussion: DHCP and RA could be specified instead of (or in
-  addition to) DNS-SD.<a href="#section-7-6.1.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
 </section>
 </div>
 <div id="operational-notes">
@@ -1709,8 +1702,8 @@ is unavailable.<a href="#section-9-2" class="pilcrow">¶</a></p>
       <h2 id="name-iana-considerations">
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-10-1">Register new .well_known URI for "referee" server.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">TODO: service discovery to find Referee's DNS name.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-1">Register new .well_known URI for Referee server.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Register new DHCP option for Referee server.<a href="#section-10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-informative-references">
@@ -1722,10 +1715,6 @@ is unavailable.<a href="#section-9-2" class="pilcrow">¶</a></p>
 <dt id="DNR">[DNR]</dt>
       <dd>
 <span class="refAuthor">Boucadair, M., Ed.</span>, <span class="refAuthor">Reddy.K, T., Ed.</span>, <span class="refAuthor">Wing, D.</span>, <span class="refAuthor">Cook, N.</span>, and <span class="refAuthor">T. Jensen</span>, <span class="refTitle">"DHCP and Router Advertisement Options for the Discovery of Network-designated Resolvers (DNR)"</span>, <span class="seriesInfo">RFC 9463</span>, <span class="seriesInfo">DOI 10.17487/RFC9463</span>, <time datetime="2023-11" class="refDate">November 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9463">https://www.rfc-editor.org/rfc/rfc9463</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="DNS-SD">[DNS-SD]</dt>
-      <dd>
-<span class="refAuthor">Cheshire, S.</span> and <span class="refAuthor">M. Krochmal</span>, <span class="refTitle">"DNS-Based Service Discovery"</span>, <span class="seriesInfo">RFC 6763</span>, <span class="seriesInfo">DOI 10.17487/RFC6763</span>, <time datetime="2013-02" class="refDate">February 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6763">https://www.rfc-editor.org/rfc/rfc6763</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="Homenet">[Homenet]</dt>
       <dd>

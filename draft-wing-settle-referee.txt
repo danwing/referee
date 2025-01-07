@@ -359,10 +359,10 @@ Table of Contents
    TODO: needs more detail and discussion.
 
    To ease initial bootstrapping the client, the local domain can
-   advertise its Referee server using a SRV resource record of
-   "referee._http._tcp.local" using [DNS-SD].  The client connects to
-   that server using HTTPS and extracts the public key.  That public key
-   has either not been seen before or has been seen before:
+   advertise its Referee server using a new DHCP option.  The client
+   connects to that server using HTTPS and extracts the public key.
+   That public key has either not been seen before or has been seen
+   before:
 
    *  If the public key has not been seen before, the user needs to
       approve use of that Referee trust anchor for this local domain;
@@ -390,9 +390,6 @@ Table of Contents
       solved with just one device on the local domain (the Referee)
       rather than each of the servers on the local network.
 
-      Discussion: DHCP and RA could be specified instead of (or in
-      addition to) DNS-SD.
-
 8.  Operational Notes
 
    The Referee has to always be available.  The client cache helps
@@ -414,9 +411,9 @@ Table of Contents
 
 10.  IANA Considerations
 
-   Register new .well_known URI for "referee" server.
+   Register new .well_known URI for Referee server.
 
-   TODO: service discovery to find Referee's DNS name.
+   Register new DHCP option for Referee server.
 
 11.  Informative References
 
@@ -425,10 +422,6 @@ Table of Contents
               the Discovery of Network-designated Resolvers (DNR)",
               RFC 9463, DOI 10.17487/RFC9463, November 2023,
               <https://www.rfc-editor.org/rfc/rfc9463>.
-
-   [DNS-SD]   Cheshire, S. and M. Krochmal, "DNS-Based Service
-              Discovery", RFC 6763, DOI 10.17487/RFC6763, February 2013,
-              <https://www.rfc-editor.org/rfc/rfc6763>.
 
    [Homenet]  Pfister, P. and T. Lemon, "Special-Use Domain
               'home.arpa.'", RFC 8375, DOI 10.17487/RFC8375, May 2018,
