@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>A Referee to Authenticate Servers in Local Domains</title>
+<meta content="Dan Wing" name="author">
+<meta content="
+       Obtaining and maintaining PKI certificates for devices in a local
+domain network is difficult for both technical and human factors
+reasons. This document describes an alternative approach to securely
+identify and authenticate servers in the local domain using a
+HTTPS-based trust anchor system, called a Referee.  The Referee allows
+bootstrapping a network of devices by trusting only the Referee trust
+anchor in the local domain. 
+    " name="description">
+<meta content="xml2rfc 3.25.0" name="generator">
+<meta content="local domain" name="keyword">
+<meta content="tls" name="keyword">
+<meta content="certificate" name="keyword">
+<meta content="allow-list" name="keyword">
+<meta content="allow list" name="keyword">
+<meta content="whitelist" name="keyword">
+<meta content="draft-wing-settle-referee-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.25.0
+    Python 3.12.8
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.1
+    intervaltree 3.1.0
+    Jinja2 3.1.5
+    lxml 5.3.0
+    platformdirs 4.3.6
+    pycountry 24.6.1
+    PyYAML 6.0.2
+    requests 2.32.3
+    setuptools 70.3.0
+    wcwidth 0.2.13
+-->
+<link href="draft-wing-settle-referee.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+    }
+  }
+  &.olPercent > dt {
+    float: none;
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+}
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+/* Comments */
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc nav {
+    font-family: var(--font-title);
+    font-weight: 360;
+    & > ul { margin-bottom: 2em; }
+    & ul {
+      margin: 0 0 0 4px;
+      & :is(p, li) {
+        margin: 2px 0;
+      }
+    }
+  }
+  #toc a.toplink {
+    float: right;
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+    &::before { /* css hamburger */
+      float: right;
+      position: relative;
+      width: 1em;
+      height: 1px;
+      left: -164px;
+      margin: 8px 0 0 0;
+      background: white none repeat scroll 0 0;
+      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+      content: "";
+    }
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active {
+    opacity: 1;
+    & nav { display: block; }
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:is(:link, :focus, :hover),
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin: 2px 0.5em 0;
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+  #toc a.toplink {
+    margin: 8px 0.5em 0;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Local Domain Referee</td>
+<td class="right">January 2025</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Wing</td>
+<td class="center">Expires 12 July 2025</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-wing-settle-referee-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2025-01-08" class="published">8 January 2025</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2025-07-12">12 July 2025</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">D. Wing</div>
+<div class="org">Citrix</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">A Referee to Authenticate Servers in Local Domains</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">Obtaining and maintaining PKI certificates for devices in a local
+domain network is difficult for both technical and human factors
+reasons. This document describes an alternative approach to securely
+identify and authenticate servers in the local domain using a
+HTTPS-based trust anchor system, called a Referee.  The Referee allows
+bootstrapping a network of devices by trusting only the Referee trust
+anchor in the local domain.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://danwing.github.io/referee/draft-wing-settle-referee.html">https://danwing.github.io/referee/draft-wing-settle-referee.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-wing-settle-referee/">https://datatracker.ietf.org/doc/draft-wing-settle-referee/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        SETTLE  mailing list (<span><a href="mailto:settle@ietf.org">mailto:settle@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/settle/">https://mailarchive.ietf.org/arch/browse/settle/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/settle/">https://www.ietf.org/mailman/listinfo/settle/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/danwing/referee">https://github.com/danwing/referee</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 12 July 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2025 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-unique-characteristics" class="internal xref">Unique Characteristics</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-requirements-evaluation" class="internal xref">Requirements Evaluation</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-operation" class="internal xref">Operation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-referee" class="internal xref">Referee</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-servers" class="internal xref">Servers</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-clients" class="internal xref">Clients</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-revoking-authorization" class="internal xref">Revoking Authorization</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-bootstrapping-the-referee" class="internal xref">Bootstrapping the Referee</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-clients-to-referee" class="internal xref">Clients to Referee</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-servers-to-referee" class="internal xref">Servers to Referee</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-short-code-or-scan-code" class="internal xref">Short Code or Scan Code</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-incremental-deployment-and-" class="internal xref">Incremental Deployment and Manual Referee Configuration</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-identifying-servers-as-loca" class="internal xref">Identifying Servers as Local</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-local-domain-names" class="internal xref">Local Domain Names</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-local-ip-addresses" class="internal xref">Local IP Addresses</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-service-discovery" class="internal xref">Service Discovery</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-operational-considerations" class="internal xref">Operational Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-issues-for-further-discussi" class="internal xref">Issues for Further Discussion</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-pki-fallback" class="internal xref">PKI Fallback</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-distinct-local-domain-with-" class="internal xref">Distinct Local Domain with its Own Referee</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
+                <p id="section-toc.1-1.12.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-redundant-referees-on-one-l" class="internal xref">Redundant Referees on One Local Domain</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.4">
+                <p id="section-toc.1-1.12.2.4.1"><a href="#appendix-A.4" class="auto internal xref">A.4</a>.  <a href="#name-unique-names" class="internal xref">Unique Names</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5">
+                <p id="section-toc.1-1.12.2.5.1"><a href="#appendix-A.5" class="auto internal xref">A.5</a>.  <a href="#name-key-lifetime-rotating-publi" class="internal xref">Key Lifetime (Rotating Public Key)</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5.2.1">
+                    <p id="section-toc.1-1.12.2.5.2.1.1"><a href="#appendix-A.5.1" class="auto internal xref">A.5.1</a>.  <a href="#name-server" class="internal xref">Server</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5.2.2">
+                    <p id="section-toc.1-1.12.2.5.2.2.1"><a href="#appendix-A.5.2" class="auto internal xref">A.5.2</a>.  <a href="#name-referee-2" class="internal xref">Referee</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">Most existing TLS communications require the server obtaining a
+certificate signed by a Certification Authority trusted by the client.
+Within a local domain network this is fraught with complications of both
+human factors and technical natures (e.g., local domain firewall,
+lack of domain name).<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This document describes a trust anchor system to authorize the
+legitimate servers on the local domain.  The trust anchor host, called a
+Referee, helps clients identify and authenticate previously-enrolled
+servers within the local domain.  The Referee system purposefully
+avoids Public Key Infrastructure using X.509 <span>[<a href="#PKIX" class="cite xref">PKIX</a>]</span>,
+instead using an "allow list" of public keys.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">When clients TLS connect to a server on the local domain and encounter a
+self-signed certificate that might otherwise cause an authentication
+failure (typically, a warning to the user), the client can send an
+HTTP query the local domain's pre-authorized Referee system to learn
+if that server has been enrolled with the Referee.  If so, it
+indicates the server was enrolled in the Referee trust anchor and the
+TLS connection can continue.<a href="#section-1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="unique-characteristics">
+<section id="section-2">
+      <h2 id="name-unique-characteristics">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-unique-characteristics" class="section-name selfRef">Unique Characteristics</a>
+      </h2>
+<p id="section-2-1">The system described in this draft has several characteristics that
+differ from other trust anchor systems:<a href="#section-2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-2.1">
+          <p id="section-2-2.1.1">requires an always-on Referee server to authenticate servers on
+the local domain,<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.2">
+          <p id="section-2-2.2.1">the client validates a server is authorized on the local domain via
+an HTTPS query to the (Referee) server on the local domain, rather than
+a signed certificate,<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.3">
+          <p id="section-2-2.3.1">can use raw public keys, as the dates and certificate signatures of
+servers on the local domain are ignored by this system, in favor of
+consulting the Referee,<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.4">
+          <p id="section-2-2.4.1">handles name collisions for servers on different networks, so two
+different networks can both have servers with the same name (e.g.,
+router.local),<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.5">
+          <p id="section-2-2.5.1">handles unique names for servers (e.g., router-abcdef123456.local),<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.6">
+          <p id="section-2-2.6.1">servers that participate in the Referee system can change their
+public keys periodically and inform the Referee, which allows
+clients to automatically handle those public key changes, and<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.7">
+          <p id="section-2-2.7.1">can operate without changes to non-Referee servers on the local
+domain, provided such servers do not change their public
+keys.<a href="#section-2-2.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="requirements-evaluation">
+<section id="section-3">
+      <h2 id="name-requirements-evaluation">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-requirements-evaluation" class="section-name selfRef">Requirements Evaluation</a>
+      </h2>
+<p id="section-3-1">Using requirements from <span>[<a href="#I-D.rbw-home-servers" class="cite xref">I-D.rbw-home-servers</a>]</span>, the proposal in this
+document has the following summarized characteristics:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<span id="name-summary-of-referee-against-"></span><div id="table1">
+<table class="center" id="table-1">
+        <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-summary-of-referee-against-" class="selfRef">Summary of Referee Against Requirements</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-right" rowspan="1" colspan="1">Solution</th>
+            <th class="text-center" rowspan="1" colspan="1">Reduce CA</th>
+            <th class="text-center" rowspan="1" colspan="1">Eliminate CA</th>
+            <th class="text-center" rowspan="1" colspan="1">Existing CA Support</th>
+            <th class="text-center" rowspan="1" colspan="1">Existing Client Support</th>
+            <th class="text-center" rowspan="1" colspan="1">Revoke Auth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-right" rowspan="1" colspan="1">Referee</td>
+            <td class="text-center" rowspan="1" colspan="1">Yes</td>
+            <td class="text-center" rowspan="1" colspan="1">Yes</td>
+            <td class="text-center" rowspan="1" colspan="1">N/A</td>
+            <td class="text-center" rowspan="1" colspan="1">No</td>
+            <td class="text-center" rowspan="1" colspan="1">Yes</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+</section>
+</div>
+<div id="operation">
+<section id="section-4">
+      <h2 id="name-operation">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-operation" class="section-name selfRef">Operation</a>
+      </h2>
+<p id="section-4-1">The following message diagram depicts messages after the client has
+previously authorized this Referee and attempts its first connection to a server
+on the local domain.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<span id="name-message-sequence-diagram-wi"></span><div id="figure1">
+<figure id="figure-1">
+        <div id="section-4-2.1">
+          <div class="alignLeft art-svg artwork" id="section-4-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="528" width="504" viewBox="0 0 504 528" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,32 L 8,80" fill="none" stroke="black"></path>
+              <path d="M 40,80 L 40,144" fill="none" stroke="black"></path>
+              <path d="M 40,224 L 40,240" fill="none" stroke="black"></path>
+              <path d="M 40,320 L 40,336" fill="none" stroke="black"></path>
+              <path d="M 64,32 L 64,80" fill="none" stroke="black"></path>
+              <path d="M 112,48 L 112,80" fill="none" stroke="black"></path>
+              <path d="M 144,80 L 144,96" fill="none" stroke="black"></path>
+              <path d="M 144,128 L 144,208" fill="none" stroke="black"></path>
+              <path d="M 144,256 L 144,304" fill="none" stroke="black"></path>
+              <path d="M 144,352 L 144,448" fill="none" stroke="black"></path>
+              <path d="M 144,480 L 144,512" fill="none" stroke="black"></path>
+              <path d="M 184,48 L 184,80" fill="none" stroke="black"></path>
+              <path d="M 232,224 L 232,240" fill="none" stroke="black"></path>
+              <path d="M 232,320 L 232,336" fill="none" stroke="black"></path>
+              <path d="M 248,48 L 248,80" fill="none" stroke="black"></path>
+              <path d="M 288,80 L 288,144" fill="none" stroke="black"></path>
+              <path d="M 288,208 L 288,264" fill="none" stroke="black"></path>
+              <path d="M 288,304 L 288,368" fill="none" stroke="black"></path>
+              <path d="M 288,400 L 288,448" fill="none" stroke="black"></path>
+              <path d="M 328,48 L 328,80" fill="none" stroke="black"></path>
+              <path d="M 344,32 L 344,80" fill="none" stroke="black"></path>
+              <path d="M 408,80 L 408,368" fill="none" stroke="black"></path>
+              <path d="M 408,400 L 408,512" fill="none" stroke="black"></path>
+              <path d="M 464,32 L 464,80" fill="none" stroke="black"></path>
+              <path d="M 8,32 L 64,32" fill="none" stroke="black"></path>
+              <path d="M 344,32 L 464,32" fill="none" stroke="black"></path>
+              <path d="M 112,48 L 184,48" fill="none" stroke="black"></path>
+              <path d="M 248,48 L 328,48" fill="none" stroke="black"></path>
+              <path d="M 8,80 L 64,80" fill="none" stroke="black"></path>
+              <path d="M 112,80 L 184,80" fill="none" stroke="black"></path>
+              <path d="M 248,80 L 328,80" fill="none" stroke="black"></path>
+              <path d="M 344,80 L 464,80" fill="none" stroke="black"></path>
+              <path d="M 48,96 L 136,96" fill="none" stroke="black"></path>
+              <path d="M 32,144 L 48,144" fill="none" stroke="black"></path>
+              <path d="M 144,144 L 280,144" fill="none" stroke="black"></path>
+              <path d="M 56,208 L 216,208" fill="none" stroke="black"></path>
+              <path d="M 56,256 L 216,256" fill="none" stroke="black"></path>
+              <path d="M 144,272 L 400,272" fill="none" stroke="black"></path>
+              <path d="M 56,304 L 216,304" fill="none" stroke="black"></path>
+              <path d="M 56,352 L 216,352" fill="none" stroke="black"></path>
+              <path d="M 144,368 L 280,368" fill="none" stroke="black"></path>
+              <path d="M 152,416 L 288,416" fill="none" stroke="black"></path>
+              <path d="M 56,448 L 216,448" fill="none" stroke="black"></path>
+              <path d="M 280,448 L 296,448" fill="none" stroke="black"></path>
+              <path d="M 56,480 L 216,480" fill="none" stroke="black"></path>
+              <path d="M 152,494 L 224,494" fill="none" stroke="black"></path>
+              <path d="M 152,498 L 224,498" fill="none" stroke="black"></path>
+              <path d="M 336,494 L 400,494" fill="none" stroke="black"></path>
+              <path d="M 336,498 L 400,498" fill="none" stroke="black"></path>
+              <path d="M 56,208 C 47.16936,208 40,215.16936 40,224" fill="none" stroke="black"></path>
+              <path d="M 216,208 C 224.83064,208 232,215.16936 232,224" fill="none" stroke="black"></path>
+              <path d="M 56,256 C 47.16936,256 40,248.83064 40,240" fill="none" stroke="black"></path>
+              <path d="M 216,256 C 224.83064,256 232,248.83064 232,240" fill="none" stroke="black"></path>
+              <path d="M 56,304 C 47.16936,304 40,311.16936 40,320" fill="none" stroke="black"></path>
+              <path d="M 216,304 C 224.83064,304 232,311.16936 232,320" fill="none" stroke="black"></path>
+              <path d="M 56,352 C 47.16936,352 40,344.83064 40,336" fill="none" stroke="black"></path>
+              <path d="M 216,352 C 224.83064,352 232,344.83064 232,336" fill="none" stroke="black"></path>
+              <path d="M 56,448 C 47.16936,448 40,455.16936 40,464" fill="none" stroke="black"></path>
+              <path d="M 216,448 C 224.83064,448 232,455.16936 232,464" fill="none" stroke="black"></path>
+              <path d="M 56,480 C 47.16936,480 40,472.83064 40,464" fill="none" stroke="black"></path>
+              <path d="M 216,480 C 224.83064,480 232,472.83064 232,464" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="408,496 396,490.4 396,501.6" fill="black" transform="rotate(0,400,496)"></polygon>
+              <polygon class="arrowhead" points="408,272 396,266.4 396,277.6" fill="black" transform="rotate(0,400,272)"></polygon>
+              <polygon class="arrowhead" points="288,368 276,362.4 276,373.6" fill="black" transform="rotate(0,280,368)"></polygon>
+              <polygon class="arrowhead" points="288,144 276,138.4 276,149.6" fill="black" transform="rotate(0,280,144)"></polygon>
+              <polygon class="arrowhead" points="160,496 148,490.4 148,501.6" fill="black" transform="rotate(180,152,496)"></polygon>
+              <polygon class="arrowhead" points="160,416 148,410.4 148,421.6" fill="black" transform="rotate(180,152,416)"></polygon>
+              <polygon class="arrowhead" points="144,96 132,90.4 132,101.6" fill="black" transform="rotate(0,136,96)"></polygon>
+              <polygon class="arrowhead" points="56,96 44,90.4 44,101.6" fill="black" transform="rotate(180,48,96)"></polygon>
+              <g class="text">
+                <text x="36" y="52">DHCP</text>
+                <text x="376" y="52">Local</text>
+                <text x="428" y="52">Domain</text>
+                <text x="36" y="68">Srvr</text>
+                <text x="148" y="68">Client</text>
+                <text x="288" y="68">Referee</text>
+                <text x="404" y="68">Server</text>
+                <text x="52" y="116">1.</text>
+                <text x="84" y="116">DHCP</text>
+                <text x="172" y="116">request/response</text>
+                <text x="156" y="164">2.</text>
+                <text x="196" y="164">HTTPS:</text>
+                <text x="252" y="164">obtain</text>
+                <text x="312" y="164">Referee</text>
+                <text x="216" y="180">certificate</text>
+                <text x="280" y="180">and</text>
+                <text x="332" y="180">complete</text>
+                <text x="184" y="196">TLS</text>
+                <text x="240" y="196">handshake</text>
+                <text x="52" y="228">3.</text>
+                <text x="96" y="228">Referee</text>
+                <text x="172" y="228">previously</text>
+                <text x="108" y="244">authorized</text>
+                <text x="156" y="292">4.</text>
+                <text x="204" y="292">complete</text>
+                <text x="256" y="292">TLS</text>
+                <text x="312" y="292">handshake</text>
+                <text x="52" y="324">5.</text>
+                <text x="96" y="324">unknown</text>
+                <text x="156" y="324">public</text>
+                <text x="200" y="324">key</text>
+                <text x="76" y="340">so</text>
+                <text x="112" y="340">query</text>
+                <text x="168" y="340">Referee</text>
+                <text x="156" y="388">6.</text>
+                <text x="192" y="388">HTTPS</text>
+                <text x="232" y="388">GET</text>
+                <text x="284" y="388">server's</text>
+                <text x="348" y="388">public</text>
+                <text x="392" y="388">key</text>
+                <text x="456" y="388">fingerprint</text>
+                <text x="156" y="436">7.</text>
+                <text x="192" y="436">HTTPS</text>
+                <text x="252" y="436">response</text>
+                <text x="52" y="468">8.</text>
+                <text x="84" y="468">keys</text>
+                <text x="132" y="468">match;</text>
+                <text x="196" y="468">continue</text>
+                <text x="244" y="500">9.</text>
+                <text x="272" y="500">TLS</text>
+                <text x="308" y="500">data</text>
+              </g>
+            </svg><a href="#section-4-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-message-sequence-diagram-wi" class="selfRef">Message Sequence Diagram with Previously-Authorized Referee</a>
+        </figcaption></figure>
+</div>
+<div id="referee">
+<section id="section-4.1">
+        <h3 id="name-referee">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-referee" class="section-name selfRef">Referee</a>
+        </h3>
+<p id="section-4.1-1">The Referee trust anchor function is implemented within any always-on
+device within the local domain (e.g., router, smart home hub, NAS, or
+a virtualized CPE).  The Referee runs HTTPS and serves files
+containing public key fingerprints indexed by each server's local
+domain name.  These files are populated by servers on the local domain
+that support Referee or manually as described in <a href="#server-bootstrapping" class="auto internal xref">Section 5.2</a>.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">Clients authenticate the Referee and use HTTP GET to fetch the
+named public key fingerprint from the Referee server using a
+well-known URI.  The Referee returns the SHA-256 fingerprint of the server's public
+key as an octet-stream.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">For example if the server's name is "smarttv-abcdef123.internal" the
+following HTTP GET would be issued by the client to retrieve that
+server's public key fingerprint:<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.1-4">
+<pre>
+  GET /.well-known/referee/sha256/smarttv-abcdef123.internal
+</pre><a href="#section-4.1-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="servers">
+<section id="section-4.2">
+        <h3 id="name-servers">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-servers" class="section-name selfRef">Servers</a>
+        </h3>
+<p id="section-4.2-1">A server supporting this specification is expected to be a printer
+(using IPPS or HTTPS), file server (e.g., NAS or laptop), IoT device,
+router (especially its HTTPS-based management console), scanner,
+Smart TV, or similar.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">Each local domain device supporting Referee has a public key.  During
+installation of the device to a Referee network, the device's hostname
+and public key fingerprint are stored into the Referee Server.
+Several options exist for this step, detailed in <a href="#bootstrapping" class="auto internal xref">Section 5</a>.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">If a server's public key changes (e.g., factory reset, key rotation,
+public key algorithm change) the new key needs to be enrolled with the
+Referee and the old key removed (see <a href="#key-lifetime" class="auto internal xref">Appendix A.5</a>). Clients will
+notice the mismatch and will query the Referee, which provides the
+new key's fingerprint, authenticating the server (with its new
+key) to the client.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="clients">
+<section id="section-4.3">
+        <h3 id="name-clients">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-clients" class="section-name selfRef">Clients</a>
+        </h3>
+<p id="section-4.3-1">A client supporting this specification is first configured with the
+DNS name of its Referee server, which MAY occur via service discovery
+(see <a href="#discovery" class="auto internal xref">Section 7</a>).  The client authenticates and authorizes the
+Referee server using one of the bootstrapping mechanisms (see
+<a href="#bootstrapping" class="auto internal xref">Section 5</a>). This step occurs only once for each home network
+the client joins, as each home network is responsible for being a
+Referee for its own local domain.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">On a connection to a server on the local domain (see <a href="#local" class="auto internal xref">Section 6</a>) the
+client includes the server's local domain name in the TLS Server Name
+Indication (SNI) extension of its ClientHello.  A client MAY cache
+authorized servers on that same local domain, after the client has
+completed a TLS handshake to the Referee to verify the client is
+connected to that Referee's network.  Upon disconnection from that
+network, the client invalidates its cache until connected to a new
+network and validating that network's Referee.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">On receiving the server's certificate in the TLS exchange, the
+client will have previously cached that server+Referee combination,
+or not, as discussed below:<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.3-4.1">
+            <p id="section-4.3-4.1.1">If not previously cached, the client queries that network's Referee
+with the DNS name of the server (e.g., printer.internal).  The Referee
+responds with the public key fingerprint of that server.  The client
+checks if the public key fingerprint (from the Referee) matches the
+public key of the server (from the TLS handshake). If they match,
+communication with the server continues and the server name and its
+public key MAY be cached by the client.  If they do not match, the
+client aborts this communication session; further actions by the
+client are an implementation detail.<a href="#section-4.3-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.3-4.2">
+            <p id="section-4.3-4.2.1">If previously cached, the client determines if the cached public key
+matches the public key obtained from the TLS handshake with the
+server.  If they match, communication continues.  If they do not
+match, the queries the Referee to learn if a new key fingerprint is
+available for that server.  If a different fingerprint is returned by
+the Referee, the client verifies it matches the public key from the
+TLS handshake.  If they match, the client replaces the information in
+its cache.<a href="#section-4.3-4.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.3-5">Internally, a client might form a unique identity for a local domain
+server as hostname (e.g., printer.local) combined with the identity of
+the Referee, such as the Referee's public key fingerprint (if not
+signed by a global Certification Authority) or the Referee's name (if
+signed by a global Certification Authority).  In this way, when the
+client is on a different network (which will have a different
+Referee), a server name collision (e.g., router.local) will result in
+a unique internal identity for that server -- keeping all the
+server-specific data separate for those two servers on different
+networks (e.g., web forms, passwords, local storage, etc.)<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="revoking-authorization">
+<section id="section-4.4">
+        <h3 id="name-revoking-authorization">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-revoking-authorization" class="section-name selfRef">Revoking Authorization</a>
+        </h3>
+<p id="section-4.4-1">When the administrator revokes authorization for a server (e.g., replacement
+of a server), the administrator removes the old public key from the Referee
+and installs the new key in the Referee.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">When this replacement occurs, the clients that have not already cached
+the server's public key will simply query the Referee, which has the server's
+new public key.  The clients that have cached the server's previous public
+key will notice the mismatch, pause their communication with the server, and
+validate with the Referee that the new key is legitimate, and continue their
+communication with the server.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4-3">Thus, revoking authentication has immediate effect because the clients
+immediately validate a mismatch with the Referee.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="bootstrapping">
+<section id="section-5">
+      <h2 id="name-bootstrapping-the-referee">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-bootstrapping-the-referee" class="section-name selfRef">Bootstrapping the Referee</a>
+      </h2>
+<div id="clients-to-referee">
+<section id="section-5.1">
+        <h3 id="name-clients-to-referee">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-clients-to-referee" class="section-name selfRef">Clients to Referee</a>
+        </h3>
+<p id="section-5.1-1">The clients have to be configured to trust their Referee. This is
+a one time activity, for each home network the client joins.  This
+can be somewhat automated using service discovery (<a href="#discovery" class="auto internal xref">Section 7</a>).<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">The client is configured to trust the Referee server's public key.  If
+this key changes, session resumption might be useful to avoid having
+the client re-configured to trust that new public key, see
+<a href="#referee-public-key-change" class="auto internal xref">Appendix A.5.2</a>.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="server-bootstrapping">
+<section id="section-5.2">
+        <h3 id="name-servers-to-referee">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-servers-to-referee" class="section-name selfRef">Servers to Referee</a>
+        </h3>
+<p id="section-5.2-1">Server names and their associated public key fingerprints have to
+be enrolled with the Referee.  This can be automated by servers
+that support Referee, or can be done manually for servers that do not
+(yet) support Referee -- providing immediate value to Referee clients
+without waiting for server Referee support.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<div id="short-code-or-scan-code">
+<section id="section-5.2.1">
+          <h4 id="name-short-code-or-scan-code">
+<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-short-code-or-scan-code" class="section-name selfRef">Short Code or Scan Code</a>
+          </h4>
+<p id="section-5.2.1-1">Short code printed on the Referee-capable server which can be scanned
+by a smartphone application by the home administrator which is
+authorized to push new associations to the Referee.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="incremental-deployment-and-manual-referee-configuration">
+<section id="section-5.2.2">
+          <h4 id="name-incremental-deployment-and-">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-incremental-deployment-and-" class="section-name selfRef">Incremental Deployment and Manual Referee Configuration</a>
+          </h4>
+<p id="section-5.2.2-1">It is useful for a Referee server to provide immediate value on its
+installation, even when servers do not (yet) support Referee.  The
+Referee system requires support of both the client (to ask the Referee
+for mediation) and installation of a Referee -- which could be in the
+home router, NAS, or other always-on device.  This section explores
+how to bootstrap Referee system when servers on the local domain
+do not (yet) support Referee.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">The Referee has a user interface for manual addition of a
+server.  For example the user might cause the Referee to connect to a
+server on the local domain using TLS, extract its public key, and
+create the hostname and public key fingerprint association on the
+Referee.  Additionally, the Referee might also scan the local domain
+network looking for TLS servers on common ports (e.g., HTTPS, IMAPS,
+IPPS, NNTPS, IMAPS, POP3S) to enumerate a list of servers for the
+user to approve the same association on the Referee.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">To accommodate servers that change their public key but do not (yet)
+register that change with the Referee, the Referee can refresh its
+server fingerprints at user request.  The user request might be
+initiated by the administrator or an HTTP message from the client
+to the Referee of a key mismatch.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="local">
+<section id="section-6">
+      <h2 id="name-identifying-servers-as-loca">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-identifying-servers-as-loca" class="section-name selfRef">Identifying Servers as Local</a>
+      </h2>
+<p id="section-6-1">This section defines the domain names and IP addresses considered
+"local".<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div id="local-domain-names">
+<section id="section-6.1">
+        <h3 id="name-local-domain-names">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-local-domain-names" class="section-name selfRef">Local Domain Names</a>
+        </h3>
+<p id="section-6.1-1">The following domain name suffixes are considered "local":<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1-2.1">
+            <p id="section-6.1-2.1.1">".local" (from <span>[<a href="#mDNS" class="cite xref">mDNS</a>]</span>)<a href="#section-6.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.1-2.2">
+            <p id="section-6.1-2.2.1">".home-arpa" (from <span>[<a href="#Homenet" class="cite xref">Homenet</a>]</span>)<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.1-2.3">
+            <p id="section-6.1-2.3.1">".internal" (from <span>[<a href="#I-D.davies-internal-tld" class="cite xref">I-D.davies-internal-tld</a>]</span>)<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.1-2.4">
+            <p id="section-6.1-2.4.1">both ".localhost" and "localhost" (Section 6.3 of <span>[<a href="#RFC6761" class="cite xref">RFC6761</a>]</span>)<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="local-ip-addresses">
+<section id="section-6.2">
+        <h3 id="name-local-ip-addresses">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-local-ip-addresses" class="section-name selfRef">Local IP Addresses</a>
+        </h3>
+<p id="section-6.2-1">Additionally, if any host resolves to a local IP address and
+connection is made to that address, those are also considered
+"local":<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2-2.1">
+            <p id="section-6.2-2.1.1">10/8, 172.16/12, and 192.168/16 (from <span>[<a href="#RFC1918" class="cite xref">RFC1918</a>]</span>)<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.2">
+            <p id="section-6.2-2.2.1">169.254/16 and fe80::/10 (from <span>[<a href="#RFC3927" class="cite xref">RFC3927</a>]</span> and <span>[<a href="#RFC4291" class="cite xref">RFC4291</a>]</span>)<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.3">
+            <p id="section-6.2-2.3.1">fc00::/7 (from <span>[<a href="#RFC4193" class="cite xref">RFC4193</a>]</span>)<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.4">
+            <p id="section-6.2-2.4.1">127/8 and ::1/128 (from <span><a href="https://rfc-editor.org/rfc/rfc1122#section-3.2.1.3" class="relref">Section 3.2.1.3</a> of [<a href="#RFC1122" class="cite xref">RFC1122</a>]</span> and <span>[<a href="#RFC4291" class="cite xref">RFC4291</a>]</span>)<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="discovery">
+<section id="section-7">
+      <h2 id="name-service-discovery">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-service-discovery" class="section-name selfRef">Service Discovery</a>
+      </h2>
+<p id="section-7-1">To ease initial bootstrapping the client, the local domain can
+advertise its Referee server using a new DHCP option (see <a href="#iana" class="auto internal xref">Section 10</a>).
+The client connects to that server using HTTPS and extracts the public
+key.  Each local domain has its own Referee which only has purview
+over servers in its same local domain.  The Referee's public key has
+either not been seen before or has been seen before:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7-2.1">
+          <p id="section-7-2.1.1">If the public key has not been seen before, the user needs to
+approve use of that Referee trust anchor for this local domain; the
+exact method is out of scope of this document.<a href="#section-7-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-7-2.2">
+          <p id="section-7-2.2.1">If the public key has been seen before, and was previously approved
+(or previously rejected) by the user, that same user decision is
+applied again.<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="operational">
+<section id="section-8">
+      <h2 id="name-operational-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-operational-considerations" class="section-name selfRef">Operational Considerations</a>
+      </h2>
+<p id="section-8-1">The Referee has to always be available.  The client cache helps reduce
+load on the Referee but new clients (e.g., new devices, guest users, restored
+devices) and client cache invalidation will always cause some traffic to
+the Referee.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">When the Referee is unavailable, clients behavior devolves to what
+we have today:  servers will need to obtain a real PKI certificate
+signed by a Certification Authority already trusted by the clients, or
+else clients will need to manually trust individual certificates.<a href="#section-8-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-9">
+      <h2 id="name-security-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-9-1">TODO: expand security considerations.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">See <a href="#operational" class="auto internal xref">Section 8</a> describing client behavior when the Referee
+is unavailable.<a href="#section-9-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana">
+<section id="section-10">
+      <h2 id="name-iana-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-10-1">Register new .well_known URI for Referee server.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Register new DHCP option for Referee server.<a href="#section-10-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-11">
+      <h2 id="name-informative-references">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+      </h2>
+<dl class="references">
+<dt id="Homenet">[Homenet]</dt>
+      <dd>
+<span class="refAuthor">Pfister, P.</span> and <span class="refAuthor">T. Lemon</span>, <span class="refTitle">"Special-Use Domain 'home.arpa.'"</span>, <span class="seriesInfo">RFC 8375</span>, <span class="seriesInfo">DOI 10.17487/RFC8375</span>, <time datetime="2018-05" class="refDate">May 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8375">https://www.rfc-editor.org/rfc/rfc8375</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.davies-internal-tld">[I-D.davies-internal-tld]</dt>
+      <dd>
+<span class="refAuthor">Davies, K.</span> and <span class="refAuthor">A. McConachie</span>, <span class="refTitle">"A Top-level Domain for Private Use"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-davies-internal-tld-01</span>, <time datetime="2024-10-18" class="refDate">18 October 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-davies-internal-tld-01">https://datatracker.ietf.org/doc/html/draft-davies-internal-tld-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.rbw-home-servers">[I-D.rbw-home-servers]</dt>
+      <dd>
+<span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Boucadair, M.</span>, and <span class="refAuthor">D. Wing</span>, <span class="refTitle">"Identifying and Authenticating Home Servers: Requirements and Solution Analysis"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-rbw-home-servers-00</span>, <time datetime="2024-09-19" class="refDate">19 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-rbw-home-servers-00">https://datatracker.ietf.org/doc/html/draft-rbw-home-servers-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="mDNS">[mDNS]</dt>
+      <dd>
+<span class="refAuthor">Cheshire, S.</span> and <span class="refAuthor">M. Krochmal</span>, <span class="refTitle">"Multicast DNS"</span>, <span class="seriesInfo">RFC 6762</span>, <span class="seriesInfo">DOI 10.17487/RFC6762</span>, <time datetime="2013-02" class="refDate">February 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6762">https://www.rfc-editor.org/rfc/rfc6762</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PKIX">[PKIX]</dt>
+      <dd>
+<span class="refAuthor">Cooper, D.</span>, <span class="refAuthor">Santesson, S.</span>, <span class="refAuthor">Farrell, S.</span>, <span class="refAuthor">Boeyen, S.</span>, <span class="refAuthor">Housley, R.</span>, and <span class="refAuthor">W. Polk</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"</span>, <span class="seriesInfo">RFC 5280</span>, <span class="seriesInfo">DOI 10.17487/RFC5280</span>, <time datetime="2008-05" class="refDate">May 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5280">https://www.rfc-editor.org/rfc/rfc5280</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1122">[RFC1122]</dt>
+      <dd>
+<span class="refAuthor">Braden, R., Ed.</span>, <span class="refTitle">"Requirements for Internet Hosts - Communication Layers"</span>, <span class="seriesInfo">STD 3</span>, <span class="seriesInfo">RFC 1122</span>, <span class="seriesInfo">DOI 10.17487/RFC1122</span>, <time datetime="1989-10" class="refDate">October 1989</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1122">https://www.rfc-editor.org/rfc/rfc1122</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1918">[RFC1918]</dt>
+      <dd>
+<span class="refAuthor">Rekhter, Y.</span>, <span class="refAuthor">Moskowitz, B.</span>, <span class="refAuthor">Karrenberg, D.</span>, <span class="refAuthor">de Groot, G. J.</span>, and <span class="refAuthor">E. Lear</span>, <span class="refTitle">"Address Allocation for Private Internets"</span>, <span class="seriesInfo">BCP 5</span>, <span class="seriesInfo">RFC 1918</span>, <span class="seriesInfo">DOI 10.17487/RFC1918</span>, <time datetime="1996-02" class="refDate">February 1996</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1918">https://www.rfc-editor.org/rfc/rfc1918</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3927">[RFC3927]</dt>
+      <dd>
+<span class="refAuthor">Cheshire, S.</span>, <span class="refAuthor">Aboba, B.</span>, and <span class="refAuthor">E. Guttman</span>, <span class="refTitle">"Dynamic Configuration of IPv4 Link-Local Addresses"</span>, <span class="seriesInfo">RFC 3927</span>, <span class="seriesInfo">DOI 10.17487/RFC3927</span>, <time datetime="2005-05" class="refDate">May 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3927">https://www.rfc-editor.org/rfc/rfc3927</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4193">[RFC4193]</dt>
+      <dd>
+<span class="refAuthor">Hinden, R.</span> and <span class="refAuthor">B. Haberman</span>, <span class="refTitle">"Unique Local IPv6 Unicast Addresses"</span>, <span class="seriesInfo">RFC 4193</span>, <span class="seriesInfo">DOI 10.17487/RFC4193</span>, <time datetime="2005-10" class="refDate">October 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4193">https://www.rfc-editor.org/rfc/rfc4193</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4291">[RFC4291]</dt>
+      <dd>
+<span class="refAuthor">Hinden, R.</span> and <span class="refAuthor">S. Deering</span>, <span class="refTitle">"IP Version 6 Addressing Architecture"</span>, <span class="seriesInfo">RFC 4291</span>, <span class="seriesInfo">DOI 10.17487/RFC4291</span>, <time datetime="2006-02" class="refDate">February 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4291">https://www.rfc-editor.org/rfc/rfc4291</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6761">[RFC6761]</dt>
+      <dd>
+<span class="refAuthor">Cheshire, S.</span> and <span class="refAuthor">M. Krochmal</span>, <span class="refTitle">"Special-Use Domain Names"</span>, <span class="seriesInfo">RFC 6761</span>, <span class="seriesInfo">DOI 10.17487/RFC6761</span>, <time datetime="2013-02" class="refDate">February 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6761">https://www.rfc-editor.org/rfc/rfc6761</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8446">[RFC8446]</dt>
+    <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="issues-for-further-discussion">
+<section id="appendix-A">
+      <h2 id="name-issues-for-further-discussi">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-issues-for-further-discussi" class="section-name selfRef">Issues for Further Discussion</a>
+      </h2>
+<div id="pki-fallback">
+<section id="appendix-A.1">
+        <h3 id="name-pki-fallback">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-pki-fallback" class="section-name selfRef">PKI Fallback</a>
+        </h3>
+<p id="appendix-A.1-1">Currently the text suggests clients should fallback to PKI if Referee
+validation fails.  This means certificate warnings for self-signed
+certificates.  Is such fallback harmful or is it worthwhile?<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="distinct-local-domain-with-its-own-referee">
+<section id="appendix-A.2">
+        <h3 id="name-distinct-local-domain-with-">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-distinct-local-domain-with-" class="section-name selfRef">Distinct Local Domain with its Own Referee</a>
+        </h3>
+<p id="appendix-A.2-1">Each local domain is anticipated to have its own Referee.  Thus, when
+a client visits another network, that network will have its own
+Referee which is learned via service discovery.  That Referee is
+bootstrapped same as the 'home' network's Referee (see <a href="#bootstrapping" class="auto internal xref">Section 5</a>).<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="redundant-referees-on-one-local-domain">
+<section id="appendix-A.3">
+        <h3 id="name-redundant-referees-on-one-l">
+<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-redundant-referees-on-one-l" class="section-name selfRef">Redundant Referees on One Local Domain</a>
+        </h3>
+<p id="appendix-A.3-1">This draft only discusses a single Referee on each Local Domain.
+Multiple Referees may well be desirable for redundancy but are out of
+scope of this draft.<a href="#appendix-A.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="unique-names">
+<section id="appendix-A.4">
+        <h3 id="name-unique-names">
+<a href="#appendix-A.4" class="section-number selfRef">A.4. </a><a href="#name-unique-names" class="section-name selfRef">Unique Names</a>
+        </h3>
+<p id="appendix-A.4-1">Printer.internal or printer.local are handy names and can be used
+with a Referee system.<a href="#appendix-A.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.4-2">Unfortunately existing browsers have state that is tied to names --
+web forms, cookies, and passwords.  Thus, those existing systems need names that contain a
+unique identifier like a UUID, e.g.,
+printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal.  Or perhaps
+embedding part/all of the public key into the name itself, for
+example:<a href="#appendix-A.4-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.4-3">
+<pre>
+  printer.2180be87-3e00-4c7f-a366-5b57fce4cbf7.internal
+  nas.103a40ee-c76f-46da-84a1-054b8f18ae33.internal
+  router.fb5f73ed-275a-431e-aecf-436f0c54d69d.local
+</pre><a href="#appendix-A.4-3" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.4-4">The Referee system is ambivalent about the host name -- the Referee's
+name and each server's name need only be unique on the current local
+domain. Name collisions that occur between local domains are handled
+by the client querying the other network's trusted Referee to check
+legitimacy.<a href="#appendix-A.4-4" class="pilcrow">¶</a></p>
+<p id="appendix-A.4-5">The Referee system allows keeping the unique name the same for the
+lifetime of the device while allowing changing its public key, as
+discussed in the following section.<a href="#appendix-A.4-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="key-lifetime">
+<section id="appendix-A.5">
+        <h3 id="name-key-lifetime-rotating-publi">
+<a href="#appendix-A.5" class="section-number selfRef">A.5. </a><a href="#name-key-lifetime-rotating-publi" class="section-name selfRef">Key Lifetime (Rotating Public Key)</a>
+        </h3>
+<p id="appendix-A.5-1">For security hygiene, the public keys in a server and the Referee may
+be occasionally changed. This section discusses how such changes are
+handled by a Referee system.<a href="#appendix-A.5-1" class="pilcrow">¶</a></p>
+<div id="server">
+<section id="appendix-A.5.1">
+          <h4 id="name-server">
+<a href="#appendix-A.5.1" class="section-number selfRef">A.5.1. </a><a href="#name-server" class="section-name selfRef">Server</a>
+          </h4>
+<p id="appendix-A.5.1-1">If a server's public key changes the new key has to be installed
+into the network's Referee.  To automate such changes, the server could connect to the
+Referee and prove possession of its (old) private key (using TLS
+client authentication or using application-layer mechanism such as
+JSON Web Signature) and publish its new public key using an HTTP PUT.<a href="#appendix-A.5.1-1" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="appendix-A.5.1-2.1">
+              <p id="appendix-A.5.1-2.1.1">Note: such a PUT mechanism also means an attacker in possession of
+the server's private key can change the legitimate server's public key
+fingerprint in the Referee to now point at an attacker-controlled
+system, denying access to the legitimate server. It is still better than
+unencrypted connections, which is the case today.<a href="#appendix-A.5.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</section>
+</div>
+<div id="referee-public-key-change">
+<section id="appendix-A.5.2">
+          <h4 id="name-referee-2">
+<a href="#appendix-A.5.2" class="section-number selfRef">A.5.2. </a><a href="#name-referee-2" class="section-name selfRef">Referee</a>
+          </h4>
+<p id="appendix-A.5.2-1">If the Referee's public key changes all the clients have to
+re-authenticate the Referee's new public key.  This is uncool.<a href="#appendix-A.5.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.5.2-2">To allow changing the Referee's public key without needing the client
+to re-authenticate the Referee, the client and Referee could do
+session resumption for its subsequent connections to the Referee
+(Section 2.2 of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>).  If session resumption succeeds, the
+client can query a the Referee's own well-known URI to determine if
+the Referee's public key has changed, and update itself accordingly.<a href="#appendix-A.5.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.5.2-3">With the above technique, the client will only have to (manually)
+re-authenticate the Referee when the Referee cannot perform session
+resumption.  As session resumption is usually implemented using the
+server's private key, the Referee would need to remember its previous
+private key (or two or three).<a href="#appendix-A.5.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-B-1">Thanks to Sridharan Rajagopalan for reviews and feedback.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-C">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Dan Wing</span></div>
+<div dir="auto" class="left"><span class="org">Citrix</span></div>
+<div dir="auto" class="left"><span class="country-name">United States of America</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:danwing@gmail.com" class="email">danwing@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
