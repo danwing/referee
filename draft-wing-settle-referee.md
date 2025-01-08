@@ -138,16 +138,16 @@ on the local domain.
                  |2. HTTPS: obtain Referee        |
                  |   certificate and complete     |
                  |   TLS handshake                |
-     .-----------+-------.         |              |
-    |3. Referee previously|        |              |
-    |   authorized        |        |              |
-     '-----------+-------'         |              |
+     .-----------+---------.       |              |
+    |3. Referee previously  |      |              |
+    |   authorized          |      |              |
+     '-----------+---------'       |              |
                  +------------------------------->|
                  |4. complete TLS handshake       |
-     .-----------+-------.         |              |
-    |5. unknown public key|        |              |
-    |   so query Referee  |        |              |
-     '-----------+-------'         |              |
+     .-----------+---------.       |              |
+    |5. unknown public key  |      |              |
+    |   so query Referee    |      |              |
+     '-----------+---------'       |              |
                  +---------------->|              |
                  |6. HTTPS GET server's public key fingerprint
                  |                 |              |
@@ -170,25 +170,24 @@ containing public key fingerprints indexed by each server's local
 domain name.
 
 Clients authenticate to the Referee and use HTTP GET to fetch the
-named public key fingerprint from the Referee server.  For example to
-get public key fingerprint of a server named
-printer-abcdef123.internal and a server named router.local, the
-following two GETs would be issued:
+named public key fingerprint from the Referee server using a
+well-known URI.  The Referee returns the SHA-256 fingerprint of the server's public
+key as an octet-stream.
+
+For example if the server's name is "smarttv-abcdef123.internal" the
+following HTTP GET would be issued by the client to retrieve that
+server's public key fingerprint:
 
 ~~~~
-  GET /.well-known/referee/sha256/printer-abcdef123.internal HTTP/1.1
-  GET /.well-known/referee/sha256/printer.internal HTTP/1.1
+  GET /.well-known/referee/sha256/smarttv-abcdef123.internal
 ~~~~
-
-The data returned is the SHA-256 fingerprint of the server's public
-key returned as an octet-stream.
-
 
 ## Servers
 
 A server supporting this specification is expected to be a printer
 (using IPPS or HTTPS), file server (e.g., NAS or laptop), IoT device,
-router (especially its HTTPS-based management console), or similar.
+router (especially its HTTPS-based management console), scanner,
+Smart TV, or similar.
 
 Each local domain device supporting Referee has a public key.  During
 installation of the device to a Referee network, the device's hostname
