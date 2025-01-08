@@ -109,7 +109,6 @@ differ from other trust anchor systems:
   keys.
 
 
-
 # Requirements Evaluation
 
 Using requirements from {{?I-D.rbw-home-servers}}, the proposal in this
@@ -122,6 +121,45 @@ document has the following summarized characteristics:
 
 
 # Operation
+
+The following message diagram depicts messages after the client has
+previously authorized this Referee and attempts its first connection to a server
+on the local domain.
+
+~~~~~ aasvg
++------+                                  +--------------+
+| DHCP |     +--------+       +---------+ | Local Domain |
+| Srvr |     | Client |       | Referee | |    Server    |
++---+--+     +---+----+       +----+----+ +-------+------+
+    |<---------->|                 |              |
+    |1. DHCP request/response      |              |
+    |            |                 |              |
+   -+-           +---------------->|              |
+                 |2. HTTPS: obtain Referee        |
+                 |   certificate and complete     |
+                 |   TLS handshake                |
+     .-----------+-------.         |              |
+    |3. Referee previously|        |              |
+    |   authorized        |        |              |
+     '-----------+-------'         |              |
+                 +------------------------------->|
+                 |4. complete TLS handshake       |
+     .-----------+-------.         |              |
+    |5. unknown public key|        |              |
+    |   so query Referee  |        |              |
+     '-----------+-------'         |              |
+                 +---------------->|              |
+                 |6. HTTPS GET server's public key fingerprint
+                 |                 |              |
+                 |<----------------+              |
+                 |7. HTTPS response|              |
+     .-----------+---------.      -+-             |
+    |8. keys match; continue|                     |
+     '-----------+---------'                      |
+                 |<========= 9. TLS data ========>|
+                 |                                |
+~~~~~
+{: #figure1 title="Message Sequence Diagram with Previously-Authorized Referee"}
 
 ## Referee
 
