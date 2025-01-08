@@ -167,9 +167,10 @@ The Referee trust anchor function is implemented within any always-on
 device within the local domain (e.g., router, smart home hub, NAS, or
 a virtualized CPE).  The Referee runs HTTPS and serves files
 containing public key fingerprints indexed by each server's local
-domain name.
+domain name.  These files are populated by servers on the local domain
+that support Referee or manually as described in {{server-bootstrapping}}.
 
-Clients authenticate to the Referee and use HTTP GET to fetch the
+Clients authenticate the Referee and use HTTP GET to fetch the
 named public key fingerprint from the Referee server using a
 well-known URI.  The Referee returns the SHA-256 fingerprint of the server's public
 key as an octet-stream.
@@ -285,7 +286,7 @@ the client re-configured to trust that new public key, see
 {{referee-public-key-change}}.
 
 
-## Servers to Referee
+## Servers to Referee {#server-bootstrapping}
 
 Server names and their associated public key fingerprints have to
 be enrolled with the Referee.  This can be automated by servers
