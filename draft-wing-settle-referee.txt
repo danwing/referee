@@ -4,8 +4,8 @@
 
 Network Working Group                                            D. Wing
 Internet-Draft                                                    Citrix
-Intended status: Standards Track                          7 January 2025
-Expires: 11 July 2025
+Intended status: Standards Track                          8 January 2025
+Expires: 12 July 2025
 
 
            A Referee to Authenticate Servers in Local Domains
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 July 2025.
+   This Internet-Draft will expire on 12 July 2025.
 
 Copyright Notice
 
@@ -172,6 +172,44 @@ Table of Contents
              Table 1: Summary of Referee Against Requirements
 
 4.  Operation
+
+   The following message diagram depicts messages after the client has
+   previously authorized this Referee and attempts its first connection
+   to a server on the local domain.
+
+   +------+                                  +--------------+
+   | DHCP |     +--------+       +---------+ | Local Domain |
+   | Srvr |     | Client |       | Referee | |    Server    |
+   +---+--+     +---+----+       +----+----+ +-------+------+
+       |<---------->|                 |              |
+       |1. DHCP request/response      |              |
+       |            |                 |              |
+      -+-           +---------------->|              |
+                    |2. HTTPS: obtain Referee        |
+                    |   certificate and complete     |
+                    |   TLS handshake                |
+        .-----------+-------.         |              |
+       |3. Referee previously|        |              |
+       |   authorized        |        |              |
+        '-----------+-------'         |              |
+                    +------------------------------->|
+                    |4. complete TLS handshake       |
+        .-----------+-------.         |              |
+       |5. unknown public key|        |              |
+       |   so query Referee  |        |              |
+        '-----------+-------'         |              |
+                    +---------------->|              |
+                    |6. HTTPS GET server's public key fingerprint
+                    |                 |              |
+                    |<----------------+              |
+                    |7. HTTPS response|              |
+        .-----------+---------.      -+-             |
+       |8. keys match; continue|                     |
+        '-----------+---------'                      |
+                    |<========= 9. TLS data ========>|
+                    |                                |
+
+   Figure 1: Message Sequence Diagram with Previously-Authorized Referee
 
 4.1.  Referee
 
