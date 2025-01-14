@@ -142,6 +142,9 @@ on the local domain.
     |3. Referee previously  |      |              |
     |   authorized          |      |              |
      '-----------+---------'       |              |
+                 |                 |              |
+                ~~~  time passes  ~~~            ~~~
+                 |                 |              |
                  +------------------------------->|
                  |4. complete TLS handshake       |
      .-----------+---------.       |              |
@@ -156,7 +159,7 @@ on the local domain.
      .-----------+---------.      -+-             |
     |8. keys match; continue|                     |
      '-----------+---------'                      |
-                 |<========= 9. TLS data ========>|
+                 |<--------- 9. TLS data -------->|
                  |                                |
 ~~~~~
 {: #figure1 title="Message Sequence Diagram with Previously-Authorized Referee"}
