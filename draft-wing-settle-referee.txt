@@ -4,8 +4,8 @@
 
 Network Working Group                                            D. Wing
 Internet-Draft                                                    Citrix
-Intended status: Standards Track                         14 January 2025
-Expires: 18 July 2025
+Intended status: Standards Track                         16 January 2025
+Expires: 20 July 2025
 
 
            A Referee to Authenticate Servers in Local Domains
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 July 2025.
+   This Internet-Draft will expire on 20 July 2025.
 
 Copyright Notice
 
@@ -163,7 +163,7 @@ Table of Contents
 
     +==========+========+===========+============+==========+========+
     | Solution | Reduce | Eliminate |  Existing  | Existing | Revoke |
-    |          |   CA   |     CA    | CA Support |  Client  |  Auth  |
+    |     Name |   CA   |     CA    | CA Support |  Client  |  Auth  |
     |          |        |           |            | Support  |        |
     +==========+========+===========+============+==========+========+
     |  Referee |  Yes   |    Yes    |    N/A     |    No    |  Yes   |
@@ -173,46 +173,86 @@ Table of Contents
 
 4.  Operation
 
-   The following message diagram depicts messages after the client has
-   previously authorized this Referee and attempts its first connection
-   to a server on the local domain.
+   Figure 1 shows a client receiving the DHCP message of the local
+   network's Referee, connecting to that Referee and, because this
+   Referee has never been seen before by this client, prompting the user
+   if this Referee is to be trusted.
 
-   +------+                                  +--------------+
-   | DHCP |     +--------+       +---------+ | Local Domain |
-   | Srvr |     | Client |       | Referee | |    Server    |
-   +---+--+     +---+----+       +----+----+ +-------+------+
-       |<---------->|                 |              |
-       |1. DHCP request/response      |              |
-       |            |                 |              |
-      -+-           +---------------->|              |
-                    |2. HTTPS: obtain Referee        |
-                    |   certificate and complete     |
-                    |   TLS handshake                |
-        .-----------+---------.       |              |
-       |3. Referee previously  |      |              |
-       |   authorized          |      |              |
-        '-----------+---------'       |              |
-                    |                 |              |
-                   ~~~  time passes  ~~~            ~~~
-                    |                 |              |
-                    +------------------------------->|
-                    |4. complete TLS handshake       |
-        .-----------+---------.       |              |
-       |5. unknown public key  |      |              |
-       |   so query Referee    |      |              |
-        '-----------+---------'       |              |
-                    +---------------->|              |
-                    |6. HTTPS GET server's public key fingerprint
-                    |                 |              |
-                    |<----------------+              |
-                    |7. HTTPS response|              |
-        .-----------+---------.      -+-             |
-       |8. keys match; continue|                     |
-        '-----------+---------'                      |
-                    |<--------- 9. TLS data -------->|
-                    |                                |
+              +--------+                      +---------+
+              |  DHCP  |     +--------+       | Referee |
+              | Server |     | Client |       | Server  |
+              +----+---+     +---+----+       +----+----+
+                   |<----------->|                 |
+                   |1. DHCP request/response       |
+                   |             |                 |
+                  -+-            +---------------->|
+                                 |2. HTTPS: obtain Referee
+                                 |   certificate and complete
+                                 |   TLS handshake |
+                    .------------+-----------.     |
+                   |3. Referee not previously |    |
+                   |   authorized             |    |
+                    '------------+-----------'     |
+                                 |                 |
+                    .------------+-----------.     |
+                   |4. Prompt user for action |    |
+                    '------------+-----------'     |
+                                 |                 |
 
-   Figure 1: Message Sequence Diagram with Previously-Authorized Referee
+            Figure 1: Message Sequence Diagram with New Referee
+
+   Figure 2 shows a client connecting to a Referee that was previously
+   authorized by the client.  In this case, the user is not prompted to
+   re-authorize the Referee.
+
+              +--------+                      +---------+
+              |  DHCP  |     +--------+       | Referee |
+              | Server |     | Client |       | Server  |
+              +----+---+     +---+----+       +----+----+
+                   |<----------->|                 |
+                   |1. DHCP request/response       |
+                   |             |                 |
+                  -+-            +---------------->|
+                                 |2. HTTPS: obtain Referee
+                                 |   certificate and complete
+                                 |   TLS handshake |
+                    .------------+--------.        |
+                   |3. Referee previously  |       |
+                   |   authorized          |       |
+                    '------------+--------'        |
+                                 |                 |
+
+   Figure 2: Message Sequence Diagram with Previously-Authorized Referee
+
+   Figure 3 shows a client, after performing the above steps with its
+   Referee, connecting to a server on the local domain and then
+   validating that server's public key with its Referee.  The validation
+   with the Referee is done in lieu of validating the certificate of
+   that server on the local domain.
+
+                                     +---------+ +--------------+
+                    +--------+       | Referee | | Local Domain |
+                    | Client |       | Server  | |    Server    |
+                    +---+----+       +----+----+ +-------+------+
+                        |                 |              |
+                        +------------------------------->|
+                        |4. complete TLS handshake       |
+           .------------+--------.        |              |
+          |5. unknown public key  |       |              |
+          |   so query Referee    |       |              |
+           '------------+--------'        |              |
+                        +---------------->|              |
+                        |6. HTTPS GET server's public key fingerprint
+                        |                 |              |
+                        |<----------------+              |
+                        |7. HTTPS response|              |
+           .------------+--------.       -+-             |
+          |8. keys match; continue|                      |
+           '------------+--------'                       |
+                        |<--------- 9. TLS data -------->|
+                        |                                |
+
+        Figure 3: Message Sequence Diagram to Server on Local Domain
 
 4.1.  Referee
 
@@ -256,21 +296,24 @@ Table of Contents
 4.3.  Clients
 
    A client supporting this specification is first configured with the
-   DNS name of its Referee server, which MAY occur via service discovery
-   (see Section 7).  The client authenticates and authorizes the Referee
-   server using one of the bootstrapping mechanisms (see Section 5).
-   This step occurs only once for each home network the client joins, as
-   each home network is responsible for being a Referee for its own
-   local domain.
+   DNS name of its Referee server, which might occur via service
+   discovery (see Section 7).  The client authenticates and authorizes
+   the Referee server using one of the bootstrapping mechanisms (see
+   Section 5).  This step occurs only once for each home network the
+   client joins, as each home network is responsible for being a Referee
+   for its own local domain.  A quality implementation may reduce user
+   prompting by sharing known Referee server identities across a user's
+   various devices, or by other means.
 
    On a connection to a server on the local domain (see Section 6) the
    client includes the server's local domain name in the TLS Server Name
-   Indication (SNI) extension of its ClientHello.  A client MAY cache
-   authorized servers on that same local domain, after the client has
-   completed a TLS handshake to the Referee to verify the client is
-   connected to that Referee's network.  Upon disconnection from that
-   network, the client invalidates its cache until connected to a new
-   network and validating that network's Referee.
+   Indication (SNI) extension of its ClientHello.  A client may
+   additionally cache the association of authorized servers to that same
+   local domain, after the client has completed a TLS handshake to the
+   Referee to verify the client is connected to that Referee's network.
+   Upon disconnection from that network, the client invalidates its
+   cache until connected to a new network and validating that network's
+   Referee.
 
    On receiving the server's certificate in the TLS exchange, the client
    will have previously cached that server+Referee combination, or not,
@@ -282,8 +325,8 @@ Table of Contents
       server.  The client checks if the public key fingerprint (from the
       Referee) matches the public key of the server (from the TLS
       handshake).  If they match, communication with the server
-      continues and the server name and its public key MAY be cached by
-      the client.  If they do not match, the client aborts this
+      continues and the server name and its public key might be cached
+      by the client.  If they do not match, the client aborts this
       communication session; further actions by the client are an
       implementation detail.
 
